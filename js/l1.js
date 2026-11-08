@@ -48,12 +48,16 @@ LEVELS.push({
     // kartonnen doos met katje
     L.objs.push({ id: 'kat', x: 64, y: 114, w: 34, h: 10, solid: true, top: 92, clue: 'kat',
       draw: (L, t) => {
+        const sx = L.boxShake > 0 ? (Math.floor(t * 30) % 2 ? 1 : -1) : 0;
+        ctx.save(); ctx.translate(sx, 0);
         R(64, 102, 34, 22, '#7a6448'); R(66, 105, 30, 18, '#21190f');
         R(62, 100, 38, 3, '#8a7458'); R(64, 99, 34, 1, PAL.g9);
         R(80, 100, 2, 3, '#a89a80'); R(64, 102, 1, 22, '#6a5438'); R(97, 102, 1, 22, '#6a5438');
         txt('↑↑', 68, 112, '#5a4428', 'left', 5);
         R(66, 120, 30, 3, '#4a4038');
         if (!L.cat.hidden) drawCat(L.cat.x, L.cat.y, t, { pose: L.cat.pose, shiver: !L.solved, dir: 1, eyesTo: P });
+        ctx.restore();
+        if (L.flags.mew > 0) txt('miauw!', 82, 88 - (1.2 - L.flags.mew) * 6, PAL.g9, 'center', 6);
       },
       inspect: (L, o) => {
         if (L.flags.catTaken) return;
@@ -76,7 +80,7 @@ LEVELS.push({
       inspect: (L) => {
         if (L.solved) return;
         if (!understood(L)) { say(['* Een leeg blikje in de sneeuw. Als je het een duwtje gaf, zou het flink rammelen...', '* Maar waarom zou je? Kijk eerst wat er hier aan de hand is.']); return; }
-        choose('* Als het blikje rammelend voor de voeten van het kind rolt... Nu een duwtje geven?',
+        choose('* Als het blikje rammelend tegen de doos knalt, kijkt het kind misschien op... Nu een duwtje geven?',
           ['Ja, nu!', 'Nog even wachten op het juiste moment.'], k => { if (k === 0) startAction(canAction1()); }, 1);
       } });
 
@@ -100,6 +104,8 @@ LEVELS.push({
       inspect: () => say(['* Een straatlantaarn die flikkert. Zelfs het licht lijkt het hier koud te hebben.']) });
   },
   update(L, dt) {
+    if (L.boxShake > 0) L.boxShake -= dt;
+    if (L.flags.mew > 0) L.flags.mew -= dt;
     const k = L.kid;
     if (!L.solved && !L.flags.kidStop) {
       if (arrived(k) && !k.hidden) { k.hidden = true; L.kidWait = 2.5; }
@@ -154,25 +160,31 @@ function canAction1() {
     start(L) { L.flags.canRolling = true; Sfx.rattle(); },
     update(L, dt) {
       this.t += dt;
-      const p = Math.min(1, this.t / 0.8);
-      L.can.y = lerp(128, 158, easeOut(p));
-      L.can.x = 150 + Math.sin(this.t * 20) * (1 - p) * 2;
-      if (p < 1 || this.checked) return;
+      const T1 = 0.9, T2 = 1.3; // eerst naar de doos rollen, dan terugstuiteren
+      if (this.t < T1) {
+        const p = easeOut(this.t / T1);
+        L.can.x = lerp(150, 101, p); L.can.y = lerp(128, 124, p) - Math.abs(Math.sin(this.t * 14)) * 2 * (1 - p);
+      } else {
+        if (!this.hit) { this.hit = true; Sfx.knock(); Sfx.tone(760, 0.28, 'triangle', 0.05, 520, 0.12); L.boxShake = 0.5; L.flags.mew = 1.2; }
+        const p = easeOut(Math.min(1, (this.t - T1) / (T2 - T1)));
+        L.can.x = lerp(101, 106, p); L.can.y = lerp(124, 128, p);
+      }
+      if (this.t < T2 || this.checked) return;
       this.checked = true;
       L.flags.canRolling = false;
       const k = L.kid;
-      if (!k.hidden && k.path.length && k.x > 140 && k.x < 210) {
+      if (!k.hidden && k.path.length && k.x > 112 && k.x < 210) {
         L.flags.kidStop = true; k.path = []; k.dir = -1;
         Sfx.rattle();
         const cat = L.cat;
         solve(L, [
-          '* KLINK - KLONK - KLINKKLINK!',
+          '* KLINK - KLONK - BONK! Het blikje knalt tegen de doos. "Miauw!"',
           () => { k.expr = 'surprised'; },
           cu('kidNotice'),
           ['Kind', 'Wa- wat was dat?'],
           cuOff,
-          '* Het kind haalt een oortje uit. Kijkt naar het blikje. Kijkt verder... naar de doos.',
-          () => { go(k, [[112, 134]], 30); k.endDir = -1; }, waitArrive(k),
+          '* Het kind haalt een oortje uit. Kijkt naar het blikje. En dan... naar de doos.',
+          () => { go(k, [[116, 136]], 30); k.endDir = -1; }, waitArrive(k),
           () => { k.arm = 'crouch'; k.expr = 'sad'; },
           pause(0.5),
           ['Kind', 'Oh... Hé, kleintje. Zit jij hier helemaal alleen?'],
@@ -197,8 +209,8 @@ function canAction1() {
         ]);
       } else {
         say(!k.hidden && k.x >= 210 ?
-          ['* Klink-klonk... Te vroeg! Het kind is nog te ver weg en hoort het niet door de oortjes.', '* Het blikje rolt terug naar zijn plekje. Probeer het nog eens.'] :
-          ['* Klink-klonk... Het blikje rolt over een leeg voetpad.', '* Wacht tot het kind er bijna is. Het komt zo weer langs.'],
+          ['* BONK! Het blikje knalt tegen de doos. Te vroeg! Het kind is nog te ver weg en hoort het niet door de oortjes.', '* Je duwt het blikje terug naar zijn plekje. Probeer het nog eens.'] :
+          ['* BONK! Het blikje knalt tegen de doos. Het katje schrikt. Maar er is niemand die het hoort.', '* Wacht tot het kind er bijna is. Het komt zo weer langs.'],
           () => { L.can.x = 150; L.can.y = 128; endAction(); });
       }
     },
