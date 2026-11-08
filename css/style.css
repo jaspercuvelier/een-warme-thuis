@@ -1,0 +1,41 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; background: #000; overflow: hidden; }
+body { display: flex; align-items: center; justify-content: center; font-family: "Courier New", monospace; touch-action: none; -webkit-user-select: none; user-select: none; }
+#wrap { width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; }
+#game {
+  width: min(100vw, calc(100vh * 4 / 3));
+  height: min(100vh, calc(100vw * 3 / 4));
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  background: #000;
+  outline: none;
+}
+#touch { display: none; position: fixed; inset: auto 0 0 0; height: 0; pointer-events: none; }
+body.touch #touch { display: block; }
+#touch button {
+  pointer-events: auto; position: fixed; width: 54px; height: 54px;
+  background: rgba(255,255,255,0.08); color: #fff; border: 2px solid rgba(255,255,255,0.6);
+  font: bold 20px "Courier New", monospace; border-radius: 0; touch-action: none;
+}
+#touch button.on { background: rgba(255,214,120,0.45); }
+#touch .up    { left: 66px;  bottom: 126px; }
+#touch .left  { left: 10px;  bottom: 70px; }
+#touch .right { left: 122px; bottom: 70px; }
+#touch .down  { left: 66px;  bottom: 14px; }
+#touch .x     { right: 80px; bottom: 30px; }
+#touch .z     { right: 14px; bottom: 80px; border-color: #ffe58a; color: #ffe58a; }
+#touch .f { right: 14px; top: 14px; bottom: auto; width: 40px; height: 40px; font-size: 16px; }
+
+/* ---------- Feedbackvenster (F) ---------- */
+#fb { display: none; position: fixed; inset: 0; z-index: 50; align-items: center; justify-content: center; background: rgba(0,0,0,0.55); }
+#fb .fb-box { width: min(640px, 94vw); max-height: 94vh; overflow: auto; background: #000; border: 3px solid #fff; padding: 16px; color: #fff; font: bold 15px "Courier New", monospace; display: flex; flex-direction: column; gap: 10px; }
+#fb .fb-title { color: #ffe58a; font-size: 18px; letter-spacing: 2px; }
+#fb .fb-title span { color: #9a9a9a; font-size: 13px; }
+#fb .fb-ctx { color: #bcbcbc; font-size: 12px; font-weight: normal; }
+#fb textarea { width: 100%; min-height: 110px; background: #111; color: #fff; border: 2px solid #7c7c7c; padding: 8px; font: 15px "Courier New", monospace; resize: vertical; user-select: text; -webkit-user-select: text; }
+#fb textarea:focus { outline: none; border-color: #ffe58a; }
+#fb #fb-out { display: none; min-height: 160px; font-size: 12px; color: #dcdcdc; }
+#fb .fb-row { display: flex; gap: 8px; flex-wrap: wrap; }
+#fb button { background: #000; color: #fff; border: 2px solid #fff; padding: 6px 10px; font: bold 13px "Courier New", monospace; cursor: pointer; }
+#fb button:hover, #fb button:focus { color: #ffe58a; border-color: #ffe58a; outline: none; }
+#fb .fb-msg { color: #ffe58a; min-height: 16px; font-size: 13px; }
