@@ -6,9 +6,23 @@
    ========================================================= */
 
 const Feedback = {
-  open: false, snap: null, notes: [], KEY: 'eenwarmethuis_feedback',
-  load() { try { this.notes = JSON.parse(localStorage.getItem(this.KEY) || '[]') || []; } catch (e) { this.notes = []; } },
-  store() { try { localStorage.setItem(this.KEY, JSON.stringify(this.notes)); } catch (e) { } },
+  open: false, snap: null, notes: [], KEY: 'eenwarmethuis_feedback', DRAFT: 'eenwarmethuis_feedback_concept',
+  /* Alles wordt in de browser bewaard (localStorage) en overleeft herladen en afsluiten.
+     Lukt localStorage niet (bv. privévenster), dan valt het terug op sessionStorage. */
+  _get(k) { try { const v = localStorage.getItem(k); if (v !== null) return v; } catch (e) { } try { return sessionStorage.getItem(k); } catch (e) { return null; } },
+  _set(k, v) { let ok = false; try { localStorage.setItem(k, v); ok = true; } catch (e) { } if (!ok) try { sessionStorage.setItem(k, v); } catch (e) { } },
+  _del(k) { try { localStorage.removeItem(k); } catch (e) { } try { sessionStorage.removeItem(k); } catch (e) { } },
+  load() { try { this.notes = JSON.parse(this._get(this.KEY) || '[]') || []; } catch (e) { this.notes = []; } },
+  store() { this._set(this.KEY, JSON.stringify(this.notes)); },
+  /* concept: wat er in het tekstvak staat, bij elke toetsaanslag bewaard */
+  draft() { try { return JSON.parse(this._get(this.DRAFT) || 'null'); } catch (e) { return null; } },
+  storeDraft() { const ta = document.getElementById('fb-text'); if (!ta) return; const v = ta.value; if (v.trim()) this._set(this.DRAFT, JSON.stringify({ text: v, meta: this.snap })); else this._del(this.DRAFT); },
+  /* een concept dat nog niet werd opgeslagen, wordt alsnog een notitie */
+  rescueDraft() {
+    const d = this.draft();
+    if (d && d.text && d.text.trim()) { this.notes.push({ text: d.text.trim(), meta: Object.assign({}, d.meta, { opmerking: 'automatisch bewaard (niet op Opslaan gedrukt)' }) }); this.store(); }
+    this._del(this.DRAFT);
+  },
 
   /* ---------- momentopname van de spelstatus ---------- */
   snapshot() {
@@ -72,6 +86,7 @@ const Feedback = {
       '</div><div class="fb-row">' +
       '<button id="fb-copy">Kopieer alles als prompt</button>' +
       '<button id="fb-show">Toon notities</button>' +
+      '<button id="fb-dl">Download als bestand</button>' +
       '<button id="fb-clear">Wis alles</button>' +
       '</div>' +
       '<textarea id="fb-out" readonly></textarea>' +
@@ -82,9 +97,11 @@ const Feedback = {
     $('fb-cancel').onclick = () => this.close();
     $('fb-copy').onclick = () => this.copy();
     $('fb-show').onclick = () => { const o = $('fb-out'); o.value = this.prompt(); o.style.display = 'block'; };
+    $('fb-dl').onclick = () => this.download();
+    $('fb-text').addEventListener('input', () => this.storeDraft());
     $('fb-clear').onclick = () => {
       if (!this.notes.length) return;
-      if (confirm('Alle ' + this.notes.length + ' notities wissen?')) { this.notes = []; this.store(); this.refresh(); this.msg('Alles gewist.'); }
+      if (confirm('Alle ' + this.notes.length + ' notities wissen?')) { this.notes = []; this.store(); this._del(this.DRAFT); this.refresh(); this.msg('Alles gewist.'); }
     };
     $('fb-text').addEventListener('keydown', e => {
       e.stopPropagation();
@@ -102,6 +119,8 @@ const Feedback = {
     if (this.open) return;
     if (!this.el) this.build();
     this.snap = this.snapshot();
+    const d = this.draft();
+    if (d && d.text) { document.getElementById('fb-text').value = d.text; if (d.meta) this.snap = d.meta; }
     this.open = true;
     Input.down = {}; Input.pressed = {};
     const c = this.snap;
@@ -112,6 +131,10 @@ const Feedback = {
     setTimeout(() => document.getElementById('fb-text').focus(), 30);
   },
   close() {
+    if (this.open) {
+      const ta = document.getElementById('fb-text');
+      if (ta && ta.value.trim()) { this.storeDraft(); this.rescueDraft(); ta.value = ''; Toast.show('Feedback automatisch bewaard (' + this.notes.length + ')', 2.5); }
+    }
     this.open = false;
     if (this.el) this.el.style.display = 'none';
     Input.down = {}; Input.pressed = {};
@@ -124,6 +147,7 @@ const Feedback = {
     if (!txtv) { this.msg('Typ eerst iets.'); return; }
     this.notes.push({ text: txtv, meta: this.snap });
     this.store();
+    this._del(this.DRAFT);
     ta.value = '';
     Toast.show('Feedback bewaard (' + this.notes.length + ')', 2);
     this.close();
@@ -145,6 +169,17 @@ const Feedback = {
     });
     return p;
   },
+  download() {
+    const text = this.prompt();
+    try {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
+      a.download = 'feedback-een-warme-thuis-' + new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-') + '.txt';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+      this.msg('Bestand gedownload. Je kan het later openen en de tekst plakken.');
+    } catch (e) { this.msg('Downloaden lukte niet. Gebruik "Kopieer alles als prompt".'); }
+  },
   copy() {
     const text = this.prompt();
     const out = document.getElementById('fb-out');
@@ -156,6 +191,15 @@ const Feedback = {
   }
 };
 Feedback.load();
+Feedback.rescueDraft(); // concept van een vorige keer (bv. tab gesloten tijdens het typen)
+
+// tab of venster sluiten terwijl er nog getypt werd: concept bewaren
+window.addEventListener('pagehide', () => { if (Feedback.open) Feedback.storeDraft(); });
+window.addEventListener('beforeunload', () => { if (Feedback.open) Feedback.storeDraft(); });
+// herinnering bij het opstarten
+window.addEventListener('load', () => {
+  if (Feedback.notes.length) setTimeout(() => Toast.show(Feedback.notes.length + ' feedbacknotitie(s) bewaard · druk F om te kopiëren', 5), 600);
+});
 
 window.addEventListener('keydown', e => {
   if (Feedback.open) return;

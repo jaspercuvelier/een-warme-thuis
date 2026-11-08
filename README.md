@@ -20,7 +20,7 @@ Laat alle bestanden en mappen (`css/`, `js/`) samen in dezelfde map staan.
 | X of SHIFT | Tekst sneller laten verschijnen |
 | R of ESC | Hoofdstuk opnieuw beginnen |
 | M | Geluid aan/uit |
-| F | **Feedback**: pauzeert het spel, typ een opmerking (er wordt automatisch vastgelegd wat er op dat moment gebeurde). Met "Kopieer alles als prompt" kopieer je alle notities in één keer. |
+| F | **Feedback**: pauzeert het spel, typ een opmerking (er wordt automatisch vastgelegd wat er op dat moment gebeurde). Met "Kopieer alles als prompt" kopieer je alle notities in één keer, of bewaar ze met "Download als bestand". Notities blijven in de browser bewaard, ook als je het venster sluit zonder op Opslaan te drukken. |
 | Muisklik / tikken | Er zitten **12 verborgen verrassingen** in de achtergronden. Klik op dingen, of bekijk iets een tweede keer... |
 | ` (backtick) | **Dev-menu**: naar een hoofdstuk springen, alle aanwijzingen geven, einde kiezen, botsingsvakken tonen |
 
