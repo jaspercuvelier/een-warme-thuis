@@ -289,34 +289,49 @@ function drawCat(x, y, t, o) {
 }
 
 /* ---------- Het lichtje (jij) ---------- */
+/* Het lichtje: een klein vlammenwezentje. Lijf van warm licht, flakkerende vlammetjes
+   op het hoofd, zwarte oogjes en blosjes, stompe armpjes en beentjes. */
 function drawSpirit(x, y, t, p) {
   x = Math.round(x); y = Math.round(y);
   const moving = p && p.moving, frame = p && p.frame, sit = p && p.sit, dir = (p && p.dir) || 1;
-  glow(x, y - 8, 26 + Math.sin(t * 2) * 2, '255,226,150', 0.2);
-  glow(x, y - 8, 10, '255,240,200', 0.35);
+  const O = '#ff9a3c', O2 = '#f07a28', Y = '#ffcf4a', C = '#fff1b8', E = '#2a160c';
+  glow(x, y - 9, 28 + Math.sin(t * 2) * 2, '255,170,80', 0.24);
+  glow(x, y - 9, 11, '255,225,150', 0.4);
   let bob = moving ? (frame ? -2 : 0) : (Math.sin(t * 3) > 0 ? -1 : 0);
   if (sit) bob = 2;
-  const c = PAL.white, c2 = PAL.soft;
-  if (!sit) {
-    if (moving) { R(x - 3, y - 1 - (frame ? 1 : 0), 2, 1, c2); R(x + 1, y - 1 - (frame ? 0 : 1), 2, 1, c2); }
-    else { R(x - 3, y - 1, 2, 1, c2); R(x + 1, y - 1, 2, 1, c2); }
-  }
   const b = y + bob;
-  R(x - 3, b - 8, 7, 6, c);
-  R(x - 4, b - 5, 9, 3, c);
-  R(x - 5, b - 3, 2, 1, c); R(x - 1, b - 2, 3, 1, c); R(x + 4, b - 3, 2, 1, c);
-  R(x - 2, b - 13, 5, 5, c);
-  R(x - 3, b - 12, 7, 3, c);
+  // beentjes
+  if (!sit) {
+    const l = moving ? (frame ? 1 : 0) : 0;
+    R(x - 3, y - 2 - l, 2, 2, O2); R(x + 1, y - 3 + l, 2, 2, O2);
+  }
+  // vlammetjes op het hoofd (flakkeren; rustig als het lichtje slaapt)
+  const fl = i => sit ? 1 : 1 + Math.round(1.5 + Math.sin(t * 9 + i * 2.1) * 1.5);
+  const h1 = fl(0), h2 = fl(1) + 1, h3 = fl(2);
+  R(x - 3, b - 11 - h1, 2, h1, O); R(x - 3, b - 11 - h1, 1, 1, Y);
+  R(x - 1, b - 12 - h2, 3, h2 + 1, Y); R(x, b - 12 - h2, 1, 1, C);
+  R(x + 2, b - 11 - h3, 2, h3, O); R(x + 3, b - 11 - h3, 1, 1, Y);
+  // lijf: oranje rand, gele gloed, licht gezichtje
+  R(x - 3, b - 12, 7, 1, O); R(x - 4, b - 11, 9, 2, O); R(x - 5, b - 9, 11, 6, O); R(x - 4, b - 3, 9, 1, O); R(x - 3, b - 2, 7, 1, O2);
+  R(x - 3, b - 11, 7, 2, Y); R(x - 4, b - 9, 9, 6, Y); R(x - 3, b - 3, 7, 1, Y);
+  R(x - 2, b - 10, 5, 6, C); R(x - 3, b - 9, 7, 4, C);
+  // armpjes
+  const sw = moving ? (frame ? 1 : -1) : 0;
+  if (p && p.hug) { R(x - 4, b - 6, 9, 1, O2); }
+  else { R(x - 6, b - 8 + sw, 1, 3, O2); R(x + 5, b - 8 - sw, 1, 3, O2); }
+  // gezichtje
   const ox = dir > 0 ? 1 : 0;
   if (sit && Math.floor(t * 0.7) % 2 === 0) {
-    R(x - 2 + ox, b - 11, 2, 1, PAL.g5); R(x + 1 + ox, b - 11, 2, 1, PAL.g5);
+    R(x - 2 + ox, b - 8, 2, 1, E); R(x + 1 + ox, b - 8, 2, 1, E);
   } else {
     const blink = Math.floor(t * 10) % 37 === 0;
-    R(x - 2 + ox, b - 11, 1, blink ? 1 : 2, PAL.g4);
-    R(x + 1 + ox, b - 11, 1, blink ? 1 : 2, PAL.g4);
+    R(x - 2 + ox, b - 9, 1, blink ? 1 : 2, E); R(x + 1 + ox, b - 9, 1, blink ? 1 : 2, E);
   }
-  R(x - 3 + ox, b - 9, 1, 1, PAL.warm); R(x + 2 + ox, b - 9, 1, 1, PAL.warm);
-  if (Math.floor(t * 2) % 5 === 0) R(x + 5, b - 16, 1, 1, PAL.yellow);
+  R(x - 1 + ox, b - 6, 2, 1, '#c0502a');
+  R(x - 3 + ox, b - 7, 1, 1, '#ff7a5a'); R(x + 2 + ox, b - 7, 1, 1, '#ff7a5a');
+  // vonkje dat opstijgt
+  const sp = (t * 0.9 + x * 0.01) % 1;
+  if (!sit && Math.floor(t * 0.9 + x * 0.01) % 2 === 0) { ctx.globalAlpha = 1 - sp; R(x + 3 - Math.round(sp * 3), b - 15 - Math.round(sp * 8), 1, 1, Y); ctx.globalAlpha = 1; }
   if (sit) { const z = (t * 0.8) % 2; txt('z', x + 5 + z * 3, b - 18 - z * 6, PAL.g7, 'left', 6); }
 }
 
