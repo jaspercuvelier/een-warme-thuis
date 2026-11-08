@@ -139,6 +139,16 @@ function drawPerson(x, y, o) {
       if (o.hold) o.hold(front + 1, top + d.arm + 1);
   }
 
+  // ---- wandelstok ----
+  if (o.cane) {
+    const cc = '#7a5634', ch = '#9a7048';
+    if (o.sit) { const sx = x + (o.back ? 9 : dir * 9); R(sx, y - 15, 1, 15, cc); R(sx - 1, y - 16, 3, 1, ch); }
+    else if (!o.arm) {
+      const hy = top + 1 + (o.moving ? (o.walk ? 1 : -1) : 0) + d.arm;
+      const sx = dir > 0 ? front + 3 : front - 1;
+      R(sx, hy, 1, y - hy, cc); R(dir > 0 ? front + 1 : front - 1, hy - 1, 3, 1, ch); R(sx, y - 1, 1, 1, PAL.g2);
+    }
+  }
   // ---- hoofd ----
   const hw = d.hw, hh = d.hh;
   const hx = x - Math.floor(hw / 2) + (o.elder ? dir : 0);

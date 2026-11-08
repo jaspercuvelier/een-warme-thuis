@@ -21,7 +21,7 @@ LEVELS.push({
     L.doors = [L.door];
 
     const opa = L.opa = makeNPC({ x: 160, y: 127, dir: 1, sit: true, back: true, speed: 18,
-      look: { elder: true, hairStyle: 'bald', hair: PAL.g9, skin: '#e0d6cc', coat: '#6a6058', vest: '#5a5048', pants: PAL.g4, glasses: true, expr: 'sad' } });
+      look: { elder: true, hairStyle: 'bald', hair: PAL.g9, skin: '#e0d6cc', coat: '#6a6058', vest: '#5a5048', pants: PAL.g4, glasses: true, cane: true, expr: 'sad' } });
     opa.extra = (n) => { if (L.flags.opaWave && n.sit) { const w = Math.floor(G.t * 5) % 2; R(n.x + 9, n.y - 34 - w, 3, 10, '#5a5048'); R(n.x + 9, n.y - 37 - w, 3, 3, '#e0d6cc'); } };
     npcObj(L, opa, { id: 'opa', clue: 'opa',
       inspect: (L, o) => {
@@ -177,16 +177,16 @@ function lampAction2() {
         () => { nb.gone = true; Sfx.tone(988, 0.3, 'sine', 0.05); Sfx.tone(784, 0.4, 'sine', 0.05, null, 0.25); },
         '* Ding-dong.',
         '* Voor het eerst in drie weken gaat de deurbel.',
-        () => { opa.sit = false; opa.back = false; opa.expr = 'happy'; opa.y = 136; go(opa, [[190, 140], [262, 118]], 20); opa.endDir = 1; },
+        () => { opa.sit = false; opa.back = false; opa.expr = 'happy'; opa.y = 136; go(opa, [[200, 140], [250, 138], [255, 122]], 20); opa.endDir = 1; },
         waitArrive(opa),
         () => { L.door.target = 1; },
         waitFor(() => L.door.open > 0.95),
-        () => { fat.hidden = false; fat.x = 275; fat.y = 104; go(fat, [[275, 114], [238, 128]], 26); fat.endDir = -1; },
+        () => { fat.hidden = false; fat.x = 275; fat.y = 104; go(fat, [[275, 114], [272, 130]], 26); fat.endDir = -1; },
         waitArrive(fat),
-        () => { opa.dir = -1; L.door.target = 0; },
+        () => { opa.dir = 1; L.door.target = 0; },
         ['Buurvrouw Fatma', 'Dag meneer Jef. Ik ben Fatma. Van nummer 14.'],
         ['Opa Jef', 'Fatma. Kom binnen, kom binnen. Wacht, ik heb nog koekjes. Ze waren voor als er eens iemand langskwam.'],
-        () => { go(opa, [[200, 150], [44, 156], [50, 150]], 22); opa.endDir = 1; go(fat, [[200, 164], [110, 160], [104, 150]], 26); fat.endDir = -1; },
+        () => { go(opa, [[252, 140], [200, 150], [44, 156], [50, 150]], 22); opa.endDir = 1; go(fat, [[266, 148], [200, 164], [110, 160], [104, 150]], 26); fat.endDir = -1; },
         waitArrive(opa, fat),
         () => { opa.sit = true; fat.sit = true; fat.look.hold = null; L.flags.tableSet = true; },
         pause(0.6),
