@@ -71,11 +71,13 @@ function pause(s) { return { wait: s }; }
 
 /* ---------- Herinnering (glinsterend) ---------- */
 function memObj(L, idx, x, y, w, h, drawFn, gx, gy) {
-  L.objs.push({
+  const o = {
     id: 'mem', x, y, w, h, top: (gy || y) - 14,
     draw: (L, t, o) => { if (drawFn) drawFn(t); if (!o.hidden) drawGlint(gx || x + w / 2, gy || y - 6, t); },
     inspect: (L, o) => memory(L, idx, o)
-  });
+  };
+  L.objs.push(o);
+  return o;
 }
 /* Eenvoudig object (alleen tekst) */
 function lookObj(L, id, x, y, w, h, top, lines, extra) {

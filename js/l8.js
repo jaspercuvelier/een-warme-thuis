@@ -15,9 +15,9 @@ LEVELS.push({
     const amir = L.amir = makeNPC({ x: 18, y: 140, dir: 1, speed: 30,
       look: { kid: true, hairStyle: 'curly', hair: PAL.g1, skin: '#a8846a', coat: PAL.g6, pants: PAL.g3, expr: 'worried' } });
     L.kids = [
-      makeNPC({ x: 212, y: 128, dir: -1, speed: 34, look: { kid: true, hairStyle: 'pony', hair: PAL.g6, coat: PAL.g8, pants: '#4a4a5a', expr: 'happy' } }),
-      makeNPC({ x: 240, y: 164, dir: -1, speed: 34, look: { kid: true, hairStyle: 'short', hair: PAL.g2, coat: '#5a6a8a', pants: PAL.g3, expr: 'happy' } }),
-      makeNPC({ x: 266, y: 126, dir: -1, speed: 34, look: { kid: true, hairStyle: 'cap', capC: '#7a3a34', coat: PAL.g6, pants: PAL.g3, expr: 'happy' } })
+      makeNPC({ x: 212, y: 128, dir: -1, speed: 34, look: { kid: true, hairStyle: 'pony', hair: PAL.g6, coat: PAL.g8, pants: '#4a4a5a', expr: 'neutral' } }),
+      makeNPC({ x: 240, y: 164, dir: -1, speed: 34, look: { kid: true, hairStyle: 'short', hair: PAL.g2, coat: '#5a6a8a', pants: PAL.g3, expr: 'neutral' } }),
+      makeNPC({ x: 266, y: 126, dir: -1, speed: 34, look: { kid: true, hairStyle: 'cap', capC: '#7a3a34', coat: PAL.g6, pants: PAL.g3, expr: 'neutral' } })
     ];
     npcObj(L, amir, { id: 'amir', clue: 'amir', solid: false,
       inspect: (L, o) => { if (L.solved) return; say(o.n === 1 ? ['* Een jongen staat al een kwartier aan het hek te kijken.',
@@ -139,7 +139,7 @@ function kickAction8() {
         '* Zonder na te denken tikt hij hem met één aanraking terug naar het veld.',
         cuOff,
         () => { ball.tx = { x: 170, y: 146 }; },
-        () => { go(lotte, [[150, 140]], 34); lotte.endDir = -1; }, waitArrive(lotte),
+        () => { go(lotte, [[150, 140]], 34); lotte.endDir = -1; lotte.expr = 'happy'; }, waitArrive(lotte),
         ['Lotte', 'Mooie aanname! Speel je mee? We hebben een verdediger nodig!'],
         () => { amir.expr = 'laugh'; amir.look.acc = PAL.orange; },
         cu('amir'),
@@ -149,7 +149,7 @@ function kickAction8() {
         ['Lotte', 'Top! Hoe heet je?'],
         ['Amir', 'Amir.'],
         ['Lotte', 'Welkom, Amir! Ik ben Lotte. Jij speelt bij ons. Wij verliezen altijd, dus je past er perfect bij.'],
-        () => { L.flags.play = true; kids.forEach(k => k.look.acc = PAL.yellow); },
+        () => { L.flags.play = true; kids.forEach(k => { k.look.acc = PAL.yellow; k.expr = 'happy'; }); },
         '* Iedereen lacht. Amir ook.',
         pause(3),
         '* Voetbal heeft geen tolk nodig.'

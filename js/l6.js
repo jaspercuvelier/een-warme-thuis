@@ -49,12 +49,12 @@ LEVELS.push({
         else if (o.n < 5) say(['* De verwarming is nog altijd koud.']);
         else say(['* Je blijft naar de koude verwarming staren.', '* Soms is kijken het enige wat je kan doen.', '* ...Maar niet vandaag.']);
       } });
-    lookObj(L, 'thermo', 104, 104, 10, 3, 40, ['* Een thermometer aan de muur: 12 graden.', '* Binnen.'], { clue: 'thermo' });
+    lookObj(L, 'thermo', 94, 104, 10, 3, 40, ['* Een thermometer aan de muur: 12 graden.', '* Binnen.'], { clue: 'thermo' });
     L.objs.push({ id: 'koelkast', x: 14, y: 104, w: 24, h: 6, solid: true, top: 44,
       draw: () => { R(14, 50, 24, 56, PAL.g8); R(14, 74, 24, 1, PAL.g6); R(34, 58, 2, 10, PAL.g6); R(34, 80, 2, 12, PAL.g6); R(17, 54, 12, 14, PAL.white); R(19, 60, 6, 6, PAL.yellow); R(22, 56, 2, 3, PAL.g5); } });
     memObj(L, 5, 16, 108, 20, 3, null, 30, 52);
     L.objs.push({ id: 'jassen', x: 288, y: 104, w: 18, h: 4, top: 40,
-      draw: () => { R(288, 50, 18, 2, '#4a3a2c'); R(289, 52, 6, 18, '#5a4a4a'); R(296, 52, 5, 14, '#4a5a6a'); R(301, 52, 4, 12, PAL.g6); },
+      draw: () => { R(288, 50, 18, 2, '#4a3a2c'); for (let i = 0; i < 4; i++) { R(289 + i * 5, 52, 1, 3, PAL.g6); R(290 + i * 5, 54, 1, 1, PAL.g6); } },
       inspect: () => say(['* De kapstok is leeg. Iedereen draagt zijn jas binnen.']) });
     L.objs.push({ id: 'raam', x: 118, y: 104, w: 50, h: 3, top: 14,
       inspect: (L) => {
@@ -94,8 +94,8 @@ LEVELS.push({
     curtain(166, 16, 14, 64, '#5a5a4a', flap(L.spots[1]));
     radiator(128, 84, 32, 14, L.heat > 0.4);
     // thermometer
-    R(106, 30, 6, 32, PAL.g8); R(108, 52 - L.heat * 12, 2, 8 + L.heat * 12, PAL.red); R(107, 60, 4, 4, PAL.red);
-    txt(Math.round(12 + L.heat * 8) + '°', 109, 66, PAL.g7, 'center', 5);
+    R(96, 30, 6, 32, PAL.g8); R(98, 52 - L.heat * 12, 2, 8 + L.heat * 12, PAL.red); R(97, 60, 4, 4, PAL.red);
+    txt(Math.round(12 + L.heat * 8) + '°', 99, 66, PAL.g7, 'center', 5);
     // foto en klok
     frameArt(60, 30, 20, 24, (x, y, w, h) => { R(x, y, w, h, '#7a8a9a'); R(x + 4, y + 6, 4, 4, PAL.g9); R(x + 10, y + 8, 3, 3, PAL.g9); R(x + 3, y + 10, 6, 10, '#6a5a5a'); R(x + 9, y + 11, 5, 9, '#5a6a5a'); });
     wallClock(214, 36, t * 30);

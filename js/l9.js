@@ -65,7 +65,8 @@ LEVELS.push({
     L.objs.push({ id: 'tank', x: 210, y: 176, w: 22, h: 8, solid: true, top: 146,
       draw: () => { R(210, 154, 22, 30, '#3a4a5a'); R(210, 154, 22, 2, '#4a5a6a'); R(214, 184, 2, 4, PAL.g5); R(226, 184, 2, 4, PAL.g5); R(232, 174, 4, 2, PAL.g6); R(234, 176 + (Math.floor(G.t * 3) % 4), 1, 1, '#8ab0d0'); },
       inspect: () => say(['* Een watertank. "Drinkwater". Iemand heeft er met krijt een zonnetje op getekend.']) });
-    memObj(L, 8, 86, 178, 32, 9, () => mudHouse(), 92, 166);
+    // de tekening ligt plat in de modder: altijd onder de personages tekenen
+    memObj(L, 8, 86, 178, 32, 9, () => mudHouse(), 92, 166).sortY = 0;
   },
   update(L, dt) {
     const last = L.trail[L.trail.length - 1];

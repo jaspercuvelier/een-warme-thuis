@@ -124,7 +124,12 @@ LEVELS.push({
     for (let s = 0; s < 3; s++) { R(232, 64 + s * 12, 72, 2, lit ? '#8a6a4a' : PAL.g4); for (let i = 0; i < 7; i++) R(235 + i * 10, 59 + s * 12, 7, 5, lit ? '#d8aa6a' : '#5a4a3a'); }
     R(228, 100, 80, 4, PAL.g5);
     wallDoor(L.door, t);
-    R(201, 64, 16, 10, lit ? '#e8d0a0' : PAL.g8); R(203, 66, 10, 1, PAL.g5); R(203, 69, 8, 1, PAL.g5);
+    // bordje hangt aan het deurblad en draait mee (wordt smaller, net als de deur)
+    const d = L.door, s = Math.max(2, Math.round(d.w * (1 - 0.82 * d.open))) / d.w;
+    if (s > 0.3) {
+      const bx = d.x + 5 * s;
+      R(bx, 64, 16 * s, 10, lit ? '#e8d0a0' : PAL.g8); R(bx + 2 * s, 66, 10 * s, 1, PAL.g5); R(bx + 2 * s, 69, 8 * s, 1, PAL.g5);
+    }
     // stoep, goot, straat
     tiles(0, 104, W, 46, '#1e1e22', '#28282c', 12);
     R(0, 104, W, 2, '#2c2c30');
