@@ -156,7 +156,7 @@ const EGGS = {
   ]
 };
 /* het lichtje zelf (alle hoofdstukken) */
-const SPIRIT_EGG = { id: 'lichtje', name: 'Het lichtje giechelt' };
+const SPIRIT_EGG = { id: 'lichtje', name: 'Het vlammetje giechelt' };
 const EGG_TOTAL = Object.keys(EGGS).reduce((n, k) => n + EGGS[k].length, 0) + 1;
 
 function eggFound(L, e) {

@@ -65,8 +65,8 @@ LEVELS.push({
           '* Het is mager. De sneeuw blijft op zijn vachtje liggen.',
           '* ...Het kijkt naar jou. Recht naar jou.',
           '* Het lijkt wel de enige hier die je kan zien.']);
-        else if (o.n < 5) { Sfx.purr(); say([o.n === 2 ? '* Je aait het katje met je licht. Prrrr... Het bibbert iets minder.' : '* Prrrrrrr.']); }
-        else if (o.n === 5) { Sfx.purr(); Save.data.catFriend = true; Save.store(); say(['* Het katje duwt zijn kopje tegen je licht.', '* Even zijn jullie allebei een beetje minder alleen.']); }
+        else if (o.n < 5) { Sfx.purr(); say([o.n === 2 ? '* Je aait het katje met je warme gloed. Prrrr... Het bibbert iets minder.' : '* Prrrrrrr.']); }
+        else if (o.n === 5) { Sfx.purr(); Save.data.catFriend = true; Save.store(); say(['* Het katje duwt zijn kopje tegen je warme gloed.', '* Even zijn jullie allebei een beetje minder alleen.']); }
         else { Sfx.purr(); say(['* Het katje spint. Het weet wie je bent.']); }
       } });
 

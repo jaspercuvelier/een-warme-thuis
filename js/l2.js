@@ -85,7 +85,7 @@ LEVELS.push({
         if (!understood(L)) { say(['* Een oude schemerlamp op de vensterbank. Ze staat uit.', '* Je weet nog niet goed waarom je hier bent. Kijk eerst wat rond.']); return; }
         say(['* De schemerlamp staat vlak bij het raam. Buiten loopt iemand voorbij...',
           '* Als het licht op het juiste ritme knippert, valt het misschien op.',
-          '* (Druk [Z] telkens wanneer de ring het lampje raakt.)'], () => startAction(lampAction2()));
+          '* (Druk op ' + OK_KEYS + ' telkens wanneer de ring het lampje raakt.)'], () => startAction(lampAction2()));
       } });
     memObj(L, 1, 272, 136, 8, 5, () => { R(272, 136, 9, 6, PAL.g9); R(273, 138, 6, 1, PAL.g5); R(273, 140, 5, 1, PAL.g5); }, 277, 132);
   },
@@ -207,8 +207,8 @@ function lampAction2() {
           ctx.beginPath(); ctx.arc(cx, cy, 5 + d * 34, 0, Math.PI * 2); ctx.stroke();
         }
       });
-      box(70, 210, 180, 24, PAL.white, PAL.black, 1);
-      txt('[Z] wanneer de ring het licht raakt', 160, 214, PAL.white, 'center', 7);
+      box(40, 210, 240, 24, PAL.white, PAL.black, 1);
+      txt('[Z/spatie/enter] wanneer de ring het licht raakt', 160, 214, PAL.white, 'center', 7);
       this.hit.forEach((h, i) => R(148 + i * 10, 224, 6, 6, h === true ? PAL.yellow : h === false ? PAL.red : PAL.g4));
     }
   };

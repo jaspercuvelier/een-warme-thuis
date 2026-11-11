@@ -88,7 +88,7 @@ const Input = {
   map: {
     ArrowUp: 'up', KeyW: 'up', ArrowDown: 'down', KeyS: 'down',
     ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right',
-    KeyZ: 'ok', Enter: 'ok', NumpadEnter: 'ok', Space: 'ok',
+    KeyQ: 'left', KeyZ: 'ok', Enter: 'ok', NumpadEnter: 'ok', Space: 'ok',
     KeyX: 'skip', ShiftLeft: 'skip', ShiftRight: 'skip',
     Escape: 'restart', KeyR: 'restart', KeyM: 'mute'
   },
@@ -99,22 +99,29 @@ const Input = {
   endFrame() { this.pressed = {}; },
   onSeq: null
 };
+/* Letters volgen wat er óp de toets staat (AZERTY én QWERTY): de Z-toets is altijd 'ok'. */
+function keyName(e) {
+  if (e.key && /^[a-z]$/i.test(e.key)) return 'Key' + e.key.toUpperCase();
+  return e.code;
+}
+/* Hoe je bevestigt, zoals het in de speltekst staat */
+const OK_KEYS = 'Z, spatie of enter';
 window.addEventListener('keydown', e => {
   if (typeof Feedback !== 'undefined' && Feedback.open) return;
   Sfx.unlock();
   if (!e.repeat) {
-    Input.seq.push(e.code);
+    Input.seq.push(keyName(e));
     if (Input.seq.length > 12) Input.seq.shift();
     if (Input.onSeq) Input.onSeq(Input.seq);
   }
-  const a = Input.map[e.code];
+  const a = Input.map[keyName(e)];
   if (a) {
     e.preventDefault();
     if (!e.repeat) Input.press(a);
   }
 });
 window.addEventListener('keyup', e => {
-  const a = Input.map[e.code];
+  const a = Input.map[keyName(e)];
   if (a) Input.release(a);
 });
 window.addEventListener('blur', () => { Input.down = {}; });

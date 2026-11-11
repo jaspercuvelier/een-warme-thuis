@@ -40,20 +40,27 @@ function bigFace(cx, cy, t, o) {
   const skin = o.skin || '#dcc4ac', sd = shade(skin, 30), hair = o.hair || PAL.g3;
   const coat = o.coat || PAL.g5, expr = exprAt(o.expr, t);
   const dk = '#161616';
-  // schouders
-  R(cx - 22, cy + 27, 44, 20, coat);
-  R(cx - 20, cy + 26, 40, 2, coat);
-  R(cx - 22, cy + 30, 3, 14, shade(coat)); R(cx + 19, cy + 30, 3, 14, shade(coat));
-  if (o.stripes) for (let j = cy + 31; j < 42; j += 4) R(cx - 22, j, 44, 2, o.stripes);
-  if (o.scarf) { R(cx - 10, cy + 24, 20, 5, o.scarf); R(cx + 3, cy + 28, 5, 9, o.scarf); }
-  if (o.vest) { R(cx - 22, cy + 32, 44, 3, o.vest); R(cx - 22, cy + 38, 44, 3, o.vest); }
-  // achterhaar / kap
-  if (o.style === 'hood') { R(cx - 15, cy - 4, 30, 32, coat); R(cx - 15, cy - 4, 30, 2, shade(coat, -12)); }
-  if (o.style === 'hijab') { R(cx - 15, cy - 4, 30, 34, o.capC || PAL.g7); R(cx - 15, cy - 4, 30, 2, shade(o.capC || PAL.g7, -12)); }
-  if (o.style === 'long' || o.style === 'curly-long') R(cx - 14, cy, 28, 28, hair);
-  if (o.style === 'bun') R(cx - 5, cy - 6, 10, 6, hair);
-  // nek (bij hoofddoek/kap bedekt)
-  if (o.style !== 'hood' && o.style !== 'hijab') { R(cx - 4, cy + 20, 8, 8, skin); R(cx - 4, cy + 22, 8, 2, sd); R(cx - 5, cy + 26, 10, 1, shade(coat, 14)); }
+  const hoodC = o.hoodC || coat, rim = shade(hoodC, -16);
+  // achterkant van kap / hoofddoek / lang haar
+  if (o.style === 'hood') {
+    R(cx - 13, cy - 6, 26, 2, hoodC); R(cx - 15, cy - 4, 30, 3, hoodC); R(cx - 16, cy - 1, 32, 26, hoodC);
+    R(cx - 16, cy + 2, 2, 22, shade(hoodC)); R(cx + 14, cy + 2, 2, 22, shade(hoodC));
+  }
+  if (o.style === 'hijab') { R(cx - 13, cy - 5, 26, 2, o.capC || PAL.g7); R(cx - 15, cy - 3, 30, 33, o.capC || PAL.g7); }
+  if (o.style === 'long' || o.style === 'curly-long') { R(cx - 14, cy + 1, 28, 27, hair); R(cx - 13, cy, 26, 1, hair); }
+  // schouders: afhangend, met een kraag rond de nek
+  const sy = cy + 27;
+  R(cx - 16, sy, 32, 2, coat); R(cx - 20, sy + 2, 40, 2, coat); R(cx - 23, sy + 4, 46, 20, coat);
+  R(cx - 23, sy + 6, 3, 14, shade(coat)); R(cx + 20, sy + 6, 3, 14, shade(coat));
+  if (o.stripes) for (let j = sy + 4; j < 42; j += 4) R(cx - 23, j, 46, 2, o.stripes);
+  if (o.vest) { R(cx - 23, sy + 5, 46, 3, o.vest); R(cx - 23, sy + 11, 46, 3, o.vest); }
+  // nek (altijd zichtbaar; bij een hoofddoek zit die er netjes rond)
+  if (o.style === 'hijab') { R(cx - 6, cy + 20, 12, 8, o.capC || PAL.g7); R(cx - 6, cy + 21, 12, 1, shade(o.capC || PAL.g7)); }
+  else {
+    R(cx - 4, cy + 19, 8, 9, skin); R(cx - 4, cy + 21, 8, 2, sd); R(cx + 2, cy + 23, 2, 4, shade(skin, 12));
+    R(cx - 6, sy - 1, 12, 2, shade(coat, 18)); R(cx - 4, sy, 8, 1, shade(skin, 20));
+  }
+  if (o.scarf) { R(cx - 9, sy - 2, 18, 4, o.scarf); R(cx + 3, sy + 1, 5, 9, o.scarf); R(cx + 3, sy + 9, 5, 1, shade(o.scarf)); }
   // hoofd
   R(cx - 10, cy + 1, 20, 21, skin); R(cx - 9, cy, 18, 23, skin); R(cx - 11, cy + 4, 22, 14, skin);
   R(cx - 12, cy + 9, 2, 5, skin); R(cx + 10, cy + 9, 2, 5, skin);
@@ -61,13 +68,32 @@ function bigFace(cx, cy, t, o) {
   // haar vooraan
   switch (o.style) {
     case 'bald': R(cx - 12, cy + 4, 3, 7, hair); R(cx + 9, cy + 4, 3, 7, hair); R(cx - 4, cy + 1, 8, 1, shade(skin, -10)); break;
-    case 'hood': R(cx - 12, cy - 2, 24, 4, coat); R(cx - 13, cy, 3, 24, coat); R(cx + 10, cy, 3, 24, coat); break;
-    case 'hijab': R(cx - 12, cy - 2, 24, 4, o.capC || PAL.g7); R(cx - 13, cy, 3, 26, o.capC || PAL.g7); R(cx + 10, cy, 3, 26, o.capC || PAL.g7); if (o.trim) R(cx - 12, cy + 1, 24, 1, o.trim); break;
+    case 'hood': // de opening van de kap rond het gezicht, met een iets lichtere rand
+      R(cx - 10, cy - 3, 20, 1, rim); R(cx - 12, cy - 2, 24, 3, rim); R(cx - 9, cy + 1, 18, 1, shade(skin, 40));
+      R(cx - 14, cy, 3, 21, rim); R(cx + 11, cy, 3, 21, rim); R(cx - 12, cy, 1, 20, hoodC); R(cx + 11, cy, 1, 20, hoodC);
+      R(cx - 14, cy + 21, 5, 4, rim); R(cx + 9, cy + 21, 5, 4, rim);
+      if (o.strings) { R(cx - 7, cy + 26, 1, 8, PAL.g9); R(cx + 6, cy + 26, 1, 8, PAL.g9); R(cx - 7, cy + 34, 1, 2, PAL.g6); R(cx + 6, cy + 34, 1, 2, PAL.g6); }
+      break;
+    case 'hijab': R(cx - 12, cy - 2, 24, 4, o.capC || PAL.g7); R(cx - 13, cy, 3, 21, o.capC || PAL.g7); R(cx + 10, cy, 3, 21, o.capC || PAL.g7); R(cx - 12, cy + 20, 4, 3, o.capC || PAL.g7); R(cx + 8, cy + 20, 4, 3, o.capC || PAL.g7); if (o.trim) R(cx - 12, cy + 1, 24, 1, o.trim); break;
     case 'beanie': R(cx - 12, cy - 4, 24, 8, o.capC || PAL.g4); R(cx - 12, cy + 2, 24, 2, shade(o.capC || PAL.g4)); R(cx - 2, cy - 7, 4, 3, o.capC || PAL.g4); for (let i = -11; i < 12; i += 3) R(cx + i, cy - 3, 1, 5, shade(o.capC || PAL.g4)); break;
-    case 'curly': case 'curly-long': R(cx - 12, cy - 3, 24, 6, hair); for (let i = -12; i < 12; i += 3) { R(cx + i, cy - 4, 2, 2, hair); R(cx + i + 1, cy + 3, 2, 2, hair); } R(cx - 12, cy, 3, 10, hair); R(cx + 9, cy, 3, 10, hair); break;
+    case 'curly': case 'curly-long': { // krullen: een volle, ronde bos met zachte golfjes, geen tandjes
+      const hl = shade(hair, -20);
+      R(cx - 10, cy - 5, 20, 1, hair); R(cx - 12, cy - 4, 24, 7, hair); R(cx - 13, cy - 2, 26, 4, hair);
+      R(cx - 12, cy + 3, 4, 8, hair); R(cx + 8, cy + 3, 4, 8, hair); R(cx - 8, cy + 3, 5, 1, hair); R(cx + 3, cy + 3, 5, 1, hair);
+      for (let i = -10; i < 10; i += 5) { R(cx + i, cy - 3, 2, 1, hl); R(cx + i + 2, cy, 2, 1, hl); }
+      R(cx - 12, cy + 6, 1, 2, hl); R(cx + 11, cy + 5, 1, 2, hl);
+      break; }
     case 'spiky': R(cx - 11, cy - 2, 22, 5, hair); for (let i = -10; i < 11; i += 3) R(cx + i, cy - 4, 2, 2, hair); R(cx - 12, cy + 1, 2, 6, hair); R(cx + 10, cy + 1, 2, 6, hair); break;
     case 'long': R(cx - 11, cy - 2, 22, 5, hair); R(cx - 12, cy, 4, 14, hair); R(cx + 8, cy, 4, 14, hair); R(cx - 3, cy + 1, 7, 3, hair); break;
-    case 'bun': R(cx - 11, cy - 2, 22, 5, hair); R(cx - 12, cy, 3, 9, hair); R(cx + 9, cy, 3, 9, hair); break;
+    case 'bun': { // haar netjes naar achteren, met een dot bovenop
+      const hl = o.hairHi || shade(hair, -18), dk2 = shade(hair, 22);
+      R(cx - 4, cy - 10, 8, 1, hair); R(cx - 6, cy - 9, 12, 5, hair); R(cx - 7, cy - 8, 14, 3, hair); R(cx - 4, cy - 4, 8, 1, hair);
+      R(cx - 3, cy - 8, 4, 1, hl); R(cx - 5, cy - 7, 2, 2, hl); R(cx + 2, cy - 5, 3, 1, dk2);
+      R(cx - 3, cy - 4, 6, 2, dk2);
+      R(cx - 9, cy - 3, 18, 1, hair); R(cx - 11, cy - 2, 22, 3, hair); R(cx - 12, cy + 1, 3, 9, hair); R(cx + 9, cy + 1, 3, 9, hair);
+      R(cx - 12, cy + 1, 1, 6, hair); R(cx + 11, cy + 1, 1, 6, hair);
+      R(cx - 9, cy + 1, 3, 1, hair); R(cx + 6, cy + 1, 3, 1, hair);
+      break; }
     default: R(cx - 11, cy - 2, 22, 5, hair); R(cx - 12, cy, 3, 8, hair); R(cx + 9, cy, 3, 8, hair); R(cx - 5, cy + 2, 6, 2, hair);
   }
   if (o.wrinkles) { R(cx - 6, cy + 5, 12, 1, sd); R(cx - 4, cy + 7, 8, 1, sd); R(cx - 11, cy + 13, 1, 2, sd); R(cx + 10, cy + 13, 1, 2, sd); }
@@ -119,7 +145,10 @@ function bigFace(cx, cy, t, o) {
     R(exL + 1, ey + 3 + Math.round(p * 9), 1, 2, '#bfe3ff');
     if (expr === 'tearsmile') R(exR + 1, ey + 3 + Math.round(((t * 0.8 + 0.5) % 1) * 9), 1, 2, '#bfe3ff');
   }
-  if (o.earbud) { R(cx - 13, cy + 11, 2, 2, PAL.white); R(cx - 12, cy + 13, 1, 16, PAL.g8); }
+  if (o.earbud) { // draadloze oortjes: een wit dopje in elk oor met een kort steeltje
+    R(cx - 13, cy + 10, 2, 2, PAL.white); R(cx - 12, cy + 12, 1, 3, PAL.g9); R(cx - 13, cy + 10, 1, 1, PAL.g8);
+    R(cx + 11, cy + 10, 2, 2, PAL.white); R(cx + 11, cy + 12, 1, 3, PAL.g9); R(cx + 12, cy + 10, 1, 1, PAL.g8);
+  }
 }
 
 function cuSnow(t, n, c) { for (let i = 0; i < (n || 14); i++) R((i * 17 + Math.sin(t + i) * 3) % 60, (i * 11 + t * (4 + i % 3)) % 42, 1, 1, c || PAL.g9); }
@@ -136,6 +165,10 @@ function qb(a, c, b, n) {
 }
 function joinPts(...arrs) { return arrs.reduce((o, a) => o.concat(o.length ? a.slice(1) : a), []); }
 function circlePts(cx, cy, r, n) { const p = []; for (let i = 0; i <= n; i++) p.push([cx + Math.cos(i / n * 6.283) * r, cy + Math.sin(i / n * 6.283) * r]); return p; }
+/* het vlammetje onder de vleugel: een hartje met drie vlammentongen, zoals het logo */
+const FLAME_DOODLE = joinPts(qb([13, 33], [9.2, 30.6], [9.7, 28]), qb([9.7, 28], [9, 26.4], [9.6, 24.8]), qb([9.6, 24.8], [10.8, 26.4], [11.6, 26.8]),
+  qb([11.6, 26.8], [12, 24.2], [14, 22.8]), qb([14, 22.8], [13.7, 25.4], [14.8, 26.8]), qb([14.8, 26.8], [16, 26.2], [17, 24.9]),
+  qb([17, 24.9], [17.2, 27.2], [16.4, 28.4]), qb([16.4, 28.4], [15.6, 31], [13, 33]));
 const DRAGON = (() => {
   const wing = joinPts(qb([33, 18], [29, 9], [23, 6]), qb([23, 6], [14, 1], [5, 2]), qb([5, 2], [10, 7], [7, 12]), qb([7, 12], [13, 14], [12, 19]), qb([12, 19], [22, 18], [30, 23]));
   const body = joinPts([[18, 15], [22, 17.5], [26, 17.5]], qb([26, 17.5], [29, 20], [30, 24]), qb([30, 24], [31, 31.5], [37, 31.5]), [[41, 31.5]],
@@ -149,7 +182,7 @@ const DRAGON = (() => {
       [[18.5, 15.2], [22, 15.8]], [[23.6, 12], [24.4, 12.2]], [[19.4, 13.4], [19.8, 13.4]]] },
     { strokes: [[[33.5, 29], [32.5, 34], [29.5, 34]], [[29.5, 34], [29, 34.8]], [[31, 34], [30.8, 34.9]], [[42, 30.5], [43.2, 34], [40, 34]], [[40, 34], [39.6, 34.9]]] },
     { strokes: [qb([45.5, 29], [52.5, 33.5], [49, 22]), [[49, 22], [46.8, 20.4], [49.8, 20.8], [51.6, 18.6], [51.2, 21.8], [49, 22]]] },
-    { fig: [13, 29], strokes: [circlePts(13, 29, 2.6, 14), [[12, 28.5], [12, 29.3]], [[14, 28.5], [14, 29.3]]] },
+    { fig: [13, 28.6], figPts: FLAME_DOODLE, strokes: [FLAME_DOODLE, [[12.2, 28.6], [12.2, 29.4]], [[14, 28.6], [14, 29.4]], qb([12.2, 30.4], [13.1, 31.1], [14, 30.4], 4)] },
     { strokes: [[[2, 35], [26, 35.2], [50, 34.8]], [[6, 35], [5.5, 33.6]], [[8, 35], [8.6, 33.8]], [[21, 35], [20.6, 33.6]], [[47, 35], [47.6, 33.8]]] }
   ];
   const len = st => { let l = 0; for (let i = 1; i < st.length; i++) l += Math.hypot(st[i][0] - st[i - 1][0], st[i][1] - st[i - 1][1]); return l; };
@@ -182,7 +215,8 @@ function drawDragon(ox, oy, s, prog, t) {
     }
     if (complete && part.fig) {
       glow(part.fig[0], part.fig[1], 9, '255,215,120', 0.55 + Math.sin(t * 3) * 0.12);
-      ctx.fillStyle = '#ffe58a'; ctx.beginPath(); ctx.arc(part.fig[0], part.fig[1], 2.6, 0, 7); ctx.fill();
+      const fp = part.figPts, fill = (c, k) => { ctx.fillStyle = c; ctx.beginPath(); fp.forEach((p, i) => { const x = part.fig[0] + (p[0] - part.fig[0]) * k, y = part.fig[1] + (p[1] - part.fig[1]) * k; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }); ctx.fill(); };
+      fill('#ffb02a', 1); fill('#ffd363', 0.72); fill('#ffe682', 0.4);
     }
     for (const st of part.strokes) {
       if (budget <= 0) break;
@@ -206,7 +240,7 @@ const CLOSEUPS = {
   kidNotice(t) {
     brickWall(0, 0, 60, 42, PAL.g2, PAL.g1);
     cuSnow(t, 10);
-    bigFace(30, 8, t, { style: 'hood', coat: PAL.g5, earbud: true, expr: [[0, 'neutral'], [0.6, 'surprised'], [2.0, 'worried']], look: t > 0.6 ? -1 : 0 });
+    bigFace(30, 7, t, { style: 'hood', coat: PAL.g5, strings: true, earbud: true, expr: [[0, 'neutral'], [0.6, 'surprised'], [2.0, 'worried']], look: t > 0.6 ? -1 : 0 });
   },
   /* H1 — het katje kijkt over de schouder en knippert traag */
   catShoulder(t) {
@@ -267,10 +301,11 @@ const CLOSEUPS = {
     // lijst
     R(12, 1, 36, 40, '#5a4a3a'); R(13, 2, 34, 38, '#6e5a46'); R(15, 4, 30, 34, '#3e3024');
     ctx.save(); ctx.beginPath(); ctx.rect(16, 5, 28, 32); ctx.clip();
-    R(16, 5, 28, 32, '#b8a68a'); glow(30, 16, 22, '240,225,190', 0.45);
-    bigFace(30, 11, 1, { style: 'curly', hair: '#e4dccc', skin: '#d8c0a0', coat: '#8a6a5a', wrinkles: true, blush: true, expr: 'happy', brow: '#a89a88' });
-    R(24, 21, 1, 1, '#b0987a'); R(35, 21, 1, 1, '#b0987a'); // lachrimpels
-    R(20, 33, 20, 4, '#7a5a4a'); R(28, 34, 4, 2, '#d0b070');   // broche
+    R(16, 5, 28, 32, '#6e7c7a'); glow(30, 18, 22, '240,225,190', 0.3);
+    ctx.save(); ctx.translate(30, 6); ctx.scale(0.75, 0.75);
+    bigFace(0, 11, 1, { style: 'bun', hair: '#e2dccf', hairHi: '#fbf7ee', skin: '#d8c0a0', coat: '#8a6a5a', wrinkles: true, blush: true, expr: 'happy', brow: '#a89a88' });
+    ctx.restore();
+    R(35, 34, 2, 2, '#d0b070'); // broche
     ctx.fillStyle = 'rgba(150,110,60,0.22)'; ctx.fillRect(16, 5, 28, 32);
     ctx.fillStyle = 'rgba(255,255,255,0.12)'; ctx.beginPath(); ctx.moveTo(16, 5); ctx.lineTo(26, 5); ctx.lineTo(16, 19); ctx.fill();
     ctx.restore();
@@ -382,7 +417,8 @@ const CLOSEUPS = {
   },
   /* H5 — Noor lacht */
   noor(t) {
-    R(0, 0, 60, 42, '#1c1c22');
+    R(0, 0, 60, 42, '#7a8698'); R(0, 0, 60, 3, '#8a96a8');
+    glow(30, 16, 34, '255,236,200', 0.35);
     bigFace(30, 9, t, { style: 'long', hair: PAL.g2, coat: PAL.g8, stripes: PAL.red, expr: [[0, 'worried'], [1.0, 'happy']], blush: t > 1 });
   },
   /* H6 — mama */
@@ -447,12 +483,47 @@ const CLOSEUPS = {
   },
   /* H8 — de bal aan zijn voeten */
   ball(t) {
-    R(0, 0, 60, 42, '#1b1b1b'); R(0, 30, 60, 1, PAL.g4);
-    R(16, 4, 5, 20, PAL.g4); R(23, 4, 5, 18, PAL.g4); R(15, 2, 14, 4, PAL.g6);
-    R(14, 22, 16, 8, PAL.g7); R(12, 26, 20, 4, PAL.g6); R(10, 28, 8, 2, PAL.g6); R(14, 25, 16, 1, PAL.white);
-    const bx = Math.max(36, 60 - t * 30);
-    R(bx - 6, 20, 12, 10, PAL.white); R(bx - 5, 19, 10, 12, PAL.white); R(bx - 7, 22, 14, 6, PAL.white);
-    R(bx - 2, 22, 4, 4, PAL.g3); R(bx - 6, 25, 2, 2, PAL.g4); R(bx + 4, 21, 2, 2, PAL.g4);
+    // speelplaats: muurtje achteraan, asfalt met een lijn
+    R(0, 0, 60, 20, '#24262a'); for (let i = 0; i < 60; i += 8) R(i, 0, 1, 20, '#2c2e32');
+    R(0, 20, 60, 22, '#3c3c40'); R(0, 20, 60, 1, '#4a4a4e'); R(0, 37, 60, 2, '#d8d8c8');
+    for (let i = 0; i < 14; i++) R((i * 23) % 60, 22 + (i * 7) % 14, 1, 1, '#46464a');
+    // schaduwen
+    ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.fillRect(7, 33, 29, 2);
+    // benen in jeans, met knie en omslag
+    const jn = '#3e4c6a', jd = '#2e3a54', jl = '#56668a';
+    const leg = (x, w) => {
+      R(x, 0, w, 27, jn); R(x, 0, 1, 27, jd); R(x + w - 1, 0, 1, 27, jd); R(x + 2, 0, 1, 25, jl);
+      R(x + 1, 10, w - 2, 1, jd); R(x + 1, 12, w - 3, 1, jl);   // knie
+      R(x - 1, 24, w + 2, 3, jn); R(x - 1, 24, w + 2, 1, jl);  // omslag
+    };
+    leg(11, 8); leg(23, 8);
+    // sneakers (naar rechts gericht): bovenkant, oranje streep, veters, witte zool
+    const shoe = (x) => {
+      const up = '#e4e4e4', ud = '#b4b4b4', st = PAL.orange;
+      R(x, 27, 9, 4, up); R(x + 9, 28, 3, 3, up); R(x + 12, 29, 1, 2, up);
+      R(x, 27, 1, 4, ud); R(x + 2, 29, 7, 1, st); R(x + 9, 30, 3, 1, st);
+      R(x + 5, 27, 1, 1, ud); R(x + 7, 27, 1, 1, ud); R(x + 9, 28, 1, 1, ud);
+      R(x - 1, 31, 15, 2, PAL.white); R(x - 1, 32, 15, 1, '#c8c8c8'); R(x + 13, 31, 1, 1, '#c8c8c8');
+    };
+    shoe(10); shoe(22);
+    // de bal rolt binnen en stopt tegen de voet
+    const bx = Math.max(42, 66 - t * 30), by = 27, r = 6.5, rot = -bx / r;
+    ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.fillRect(bx - 6, 33, 12, 2);
+    const patches = [[0, 0]];
+    for (let k = 0; k < 5; k++) patches.push([Math.cos(rot + k * 1.2566) * 5.6, Math.sin(rot + k * 1.2566) * 5.6]);
+    for (let j = -7; j <= 7; j++) for (let i = -7; i <= 7; i++) {
+      const px = i + 0.5, py = j + 0.5, d = Math.hypot(px, py);
+      if (d > r) continue;
+      const cx0 = Math.cos(rot) * 0.6, cy0 = Math.sin(rot) * 0.6;
+      let dark = false;
+      for (const p of patches) if (Math.hypot(px - p[0] - (p === patches[0] ? cx0 : 0), py - p[1] - (p === patches[0] ? cy0 : 0)) < (p === patches[0] ? 2.1 : 1.5)) { dark = true; break; }
+      if (d > r - 1.1) dark = false; // de rand blijft wit, zodat de bal mooi rond is
+      let c = dark ? '#2a2a2e' : PAL.white;
+      if (!dark && px + py > 4.5) c = '#d0d0d4';
+      if (!dark && d > r - 1 && px + py > 0) c = '#b8b8bc';
+      R(Math.floor(bx) + i, by + j, 1, 1, c);
+    }
+    R(Math.floor(bx) - 4, by - 4, 2, 1, PAL.white);
   },
   /* H9 — de sleutel van Yusuf */
   key(t) {
@@ -480,18 +551,15 @@ const CLOSEUPS = {
     for (let i = 0; i < 10; i++) R((i * 23) % 60, (i * 7) % 16, 1, 1, PAL.g6);
     glow(24, 28, 30, '255,226,150', 0.35);
     glow(44, 30, 26, '255,170,80', 0.2);
-    // lichtje groot: het vlammetje
-    const b = Math.sin(t * 2) > 0 ? -1 : 0, O = '#ff9a3c', Y = '#ffcf4a', C = '#fff1b8', E = '#2a160c';
-    glow(23, 26 + b, 18, '255,170,80', 0.35);
-    for (let i = 0; i < 3; i++) { const h = 3 + Math.round(1.5 + Math.sin(t * 8 + i * 2) * 1.5) + (i === 1 ? 2 : 0); R(16 + i * 5, 14 + b - h, 4, h, i === 1 ? Y : O); R(17 + i * 5, 14 + b - h, 2, 1, C); }
-    R(15, 14 + b, 16, 2, O); R(13, 16 + b, 20, 18, O); R(15, 34 + b, 16, 2, O);
-    R(15, 15 + b, 16, 19, Y); R(14, 18 + b, 18, 13, Y);
-    R(17, 17 + b, 12, 14, C); R(16, 20 + b, 14, 8, C);
-    R(11, 22 + b, 2, 6, '#f07a28'); R(33, 22 + b, 2, 6, '#f07a28');
-    R(17, 36, 4, 3, '#f07a28'); R(25, 36, 4, 3, '#f07a28');
-    R(19, 21 + b, 2, 3, E); R(25, 21 + b, 2, 3, E); R(19, 21 + b, 1, 1, PAL.white); R(25, 21 + b, 1, 1, PAL.white);
-    R(21, 26 + b, 4, 1, '#c0502a'); R(20, 25 + b, 1, 1, '#c0502a'); R(25, 25 + b, 1, 1, '#c0502a');
-    R(16, 25 + b, 2, 1, '#ff7a5a'); R(28, 25 + b, 2, 1, '#ff7a5a');
+    // het vlammetje, groot
+    const b = Math.sin(t * 2) > 0 ? -1 : 0, E = '#3a1c08', s4 = 4 / 3;
+    glow(23, 24 + b, 18, '255,170,80', 0.35);
+    R(17, 36, 4, 3, '#e86a10'); R(25, 36, 4, 3, '#e86a10');
+    R(11, 22 + b, 2, 6, '#e86a10'); R(34, 22 + b, 2, 6, '#e86a10');
+    drawFlameBody(23.5 - 7.5 * s4, 37 + b - 20 * s4, s4, t, false);
+    R(19, 24 + b, 2, 3, E); R(26, 24 + b, 2, 3, E); R(19, 24 + b, 1, 1, PAL.white); R(26, 24 + b, 1, 1, PAL.white);
+    R(21, 29 + b, 5, 1, '#c0402a'); R(20, 28 + b, 1, 1, '#c0402a'); R(26, 28 + b, 1, 1, '#c0402a');
+    R(16, 28 + b, 2, 1, '#ff6a4a'); R(29, 28 + b, 2, 1, '#ff6a4a');
     // katje zit ernaast
     const c = PAL.g7;
     R(36, 24, 12, 14, c); R(34, 32, 16, 6, c); R(36, 15, 12, 10, c);

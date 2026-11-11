@@ -38,7 +38,7 @@ function clue(L, id) {
 }
 function understood(L) { return L.clues.size >= L.need; }
 function notYet() {
-  say(['* Je voelt dat je hier iets kunt doen... maar je begrijpt de situatie nog niet goed. Kijk en luister eerst wat rond. [Z]']);
+  say(['* Je voelt dat je hier iets kunt doen... maar je begrijpt de situatie nog niet goed. Kijk en luister eerst wat rond. (Verder: ' + OK_KEYS + '.)']);
 }
 function startAction(mg) {
   G.mg = mg; G.state = 'ACTION';
@@ -140,12 +140,12 @@ function newGame() {
   const again = Save.data.plays > 1;
   say([
     '* Het is december. Het is koud.',
-    '* Ergens tussen de huizen dwaalt een klein licht.',
+    '* Ergens tussen de huizen dwaalt een klein vlammetje.',
     '* Niemand kan het zien. Niemand kan het horen.',
     '* Het kan geen wonderen doen. Het kan de sneeuw niet laten smelten. Het kan geen oorlog stoppen.',
     '* Maar het kan iets anders. Iets kleins.',
     '* Het kan mensen helpen om naar elkaar om te kijken.',
-    again ? '* (Welkom terug, lichtje. Ze hebben je nog steeds nodig.)' : '* (Lopen: pijltjes of WASD. Onderzoeken: Z of ENTER. Tekst versnellen: X of SHIFT. Hoofdstuk herstarten: R of ESC. Geluid: M. Feedback geven: F.)'
+    again ? '* (Welkom terug, vlammetje. Ze hebben je nog steeds nodig.)' : '* (Lopen: pijltjes of WASD. Onderzoeken en verder: Z, spatie of enter. Tekst versnellen: X of SHIFT. Hoofdstuk herstarten: R of ESC. Geluid: M. Feedback geven: F.)'
   ], () => startTransition(0));
 }
 
@@ -183,7 +183,7 @@ function movePlayer(L, dt) {
     P.idle += dt;
     if (P.idle > 25 && !P.sit) {
       P.sit = true;
-      if (!G.restShown) { G.restShown = true; Toast.show('Ook een lichtje mag even rusten.', 4); }
+      if (!G.restShown) { G.restShown = true; Toast.show('Ook een vlammetje mag even rusten.', 4); }
     }
   }
 }
@@ -266,6 +266,8 @@ function update(dt) {
   switch (G.state) {
     case 'TITLE': Title.update(dt); break;
     case 'MEMS': Mems.update(dt); break;
+    case 'ABOUT': About.update(dt); break;
+    case 'EGGS': Eggs.update(dt); break;
     case 'STORY':
       if (Menu.active) Menu.update(); else if (Dialog.active) Dialog.update(dt); else startTransition(0);
       break;
@@ -344,7 +346,7 @@ function drawTransition() {
     else if (done) R(x, y, 5, 5, PAL.g4);
     else { R(x, y, 5, 5, PAL.g3); R(x + 1, y + 1, 3, 3, PAL.black); }
   }
-  if (tr.t > 0.8 && Math.floor(G.t * 2) % 2 === 0) txt('[Z]', W / 2, 212, PAL.g7, 'center', 7);
+  if (tr.t > 0.8 && Math.floor(G.t * 2) % 2 === 0) txt('[' + OK_KEYS + ']', W / 2, 212, PAL.g7, 'center', 7);
   ctx.globalAlpha = 1;
 }
 
@@ -355,6 +357,7 @@ const Title = {
     const o = ['Nieuw spel'];
     if (Object.keys(Save.data.endings || {}).length) o.push('Hoofdstuk kiezen');
     o.push('Herinneringen (' + memCount() + '/9)');
+    o.push('Over ons');
     o.push(Sfx.muted ? 'Geluid: uit' : 'Geluid: aan');
     return o;
   },
@@ -363,8 +366,10 @@ const Title = {
     if (Menu.active) { Menu.update(); return; }
     const o = this.opts();
     G.titleIdx = Math.min(G.titleIdx, o.length - 1);
-    if (Input.hit('up')) { G.titleIdx = (G.titleIdx + o.length - 1) % o.length; Sfx.select(); }
+    // verborgen: boven 'Nieuw spel' kun je nog één keer omhoog, naar het vlammetje zelf (-1)
+    if (Input.hit('up')) { G.titleIdx = G.titleIdx === 0 ? -1 : G.titleIdx === -1 ? o.length - 1 : G.titleIdx - 1; Sfx.select(); }
     if (Input.hit('down')) { G.titleIdx = (G.titleIdx + 1) % o.length; Sfx.select(); }
+    if (Input.hit('ok') && G.titleIdx === -1) { Sfx.unlock(); Sfx.ok(); Eggs.open(); return; }
     if (Input.hit('ok')) {
       Sfx.unlock(); Sfx.ok();
       Music.play(SONGS.title);
@@ -378,6 +383,7 @@ const Title = {
         }, LEVELS.length);
       }
       else if (s.indexOf('Herinneringen') === 0) { G.state = 'MEMS'; Mems.idx = 0; }
+      else if (s === 'Over ons') { G.state = 'ABOUT'; About.scroll = 0; }
       else { Sfx.muted = !Sfx.muted; if (Sfx.muted) Music.stop(); else Music.play(SONGS.title); }
     }
   },
@@ -392,15 +398,21 @@ const Title = {
     house(206, 174, 34, 22, lit > 2 ? 2 : 0, G.t);
     drawWeather(titleSnow, G.hearts);
     // titel
-    glow(W / 2, 54, 90, '255,200,120', 0.12 + Math.sin(G.t) * 0.03);
-    txt('EEN WARME THUIS', W / 2 + 1, 36, PAL.g4, 'center', 20);
-    txt('EEN WARME THUIS', W / 2, 35, PAL.white, 'center', 20);
-    txt('een klein verhaal over omkijken naar elkaar', W / 2, 60, PAL.g8, 'center', 7);
-    drawSpirit(W / 2, 112, G.t, { moving: false, dir: 1 });
+    glow(W / 2, 40, 90, '255,200,120', 0.12 + Math.sin(G.t) * 0.03);
+    drawLogo(W / 2 - 24, 4, 48);
+    txt('EEN WARME THUIS', W / 2 + 1, 58, PAL.g4, 'center', 20);
+    txt('EEN WARME THUIS', W / 2, 57, PAL.white, 'center', 20);
+    txt('een klein verhaal over omkijken naar elkaar', W / 2, 80, PAL.g8, 'center', 7);
+    if (G.titleIdx === -1) glow(W / 2, 108, 26, '255,200,110', 0.35 + Math.sin(G.t * 4) * 0.08);
+    drawSpirit(W / 2, 120, G.t, { moving: false, dir: 1 });
+    if (G.titleIdx === -1) {
+      heart(W / 2 - 22, 106, PAL.red);
+      txt('verrassingen (' + eggCount() + '/' + (EGG_TOTAL + 1) + ')', W / 2 + 12, 107, PAL.yellow, 'left', 7);
+    }
     // menu
     const o = this.opts();
     o.forEach((s, i) => {
-      const y = 128 + i * 12, sel = i === G.titleIdx;
+      const y = 130 + i * 12, sel = i === G.titleIdx;
       if (sel) heart(W / 2 - textW(s, 8) / 2 - 12, y + 1, PAL.red);
       txt(s, W / 2, y, sel ? PAL.yellow : PAL.white, 'center', 8);
     });
@@ -411,8 +423,90 @@ const Title = {
       const x = 8 + i * 22;
       if (en[1]) { R(x, 228, 5, 5, en[2]); } else { R(x, 228, 5, 5, PAL.g4); R(x + 1, 229, 3, 3, PAL.black); }
     });
-    txt('Z = kiezen   M = geluid', W - 6, 228, PAL.g5, 'right', 6);
+    txt('Z/spatie/enter = kiezen   M = geluid', W - 6, 228, PAL.g5, 'right', 6);
     Menu.draw();
+  }
+};
+
+/* ---------- Het logo van De Warmste Week (img/dww-logo.png) ---------- */
+const LOGO = new Image();
+LOGO.src = 'img/dww-logo.png';
+function drawLogo(x, y, size) {
+  if (!LOGO.complete || !LOGO.naturalWidth) return;
+  const h = size * LOGO.naturalHeight / LOGO.naturalWidth;
+  ctx.imageSmoothingEnabled = true;
+  ctx.drawImage(LOGO, x, y, size, h);
+  ctx.imageSmoothingEnabled = false;
+}
+
+/* ---------- Over ons (de tekst staat in js/about.js) ---------- */
+const About = {
+  scroll: 0,
+  lines() {
+    const out = [];
+    OVER_ONS.alineas.forEach(a => { if (!a) out.push(''); else wrap(a, 268, 8).forEach(l => out.push(l)); });
+    return out;
+  },
+  update() {
+    const max = Math.max(0, this.lines().length - 11);
+    if (Input.hit('up') && this.scroll > 0) { this.scroll--; Sfx.select(); }
+    if (Input.hit('down') && this.scroll < max) { this.scroll++; Sfx.select(); }
+    if (Input.hit('ok') || Input.hit('skip') || Input.hit('restart')) { Sfx.ok(); G.state = 'TITLE'; G.titleIdx = Title.opts().indexOf('Over ons'); }
+  },
+  draw() {
+    R(0, 0, W, H, PAL.black);
+    glow(W / 2, 30, 60, '255,200,120', 0.12);
+    drawLogo(W / 2 - 24, 6, 48);
+    txt(OVER_ONS.titel, W / 2, 58, PAL.white, 'center', 10);
+    const ls = this.lines();
+    ls.slice(this.scroll, this.scroll + 11).forEach((l, i) => txt(l, 26, 78 + i * 12, PAL.g9, 'left', 8));
+    if (this.scroll > 0) txt('▲', W - 16, 76, PAL.g6, 'center', 7);
+    if (this.scroll + 11 < ls.length) txt('▼', W - 16, 202, PAL.g6, 'center', 7);
+    txt(OK_KEYS + ' = terug', W / 2, 224, PAL.g5, 'center', 6);
+  }
+};
+
+/* ---------- Verborgen: overzicht van de verrassingen (easter eggs) ---------- */
+function eggCount() { return Object.keys(Save.data.eggs || {}).length + (Save.data.konamiFound ? 1 : 0); }
+const Eggs = {
+  idx: 0,
+  list() {
+    const out = [];
+    Object.keys(EGGS).forEach(k => EGGS[k].forEach(e => out.push({ key: 'h' + (+k + 1) + '_' + e.id, name: e.name, h: +k + 1 })));
+    out.push({ key: 'lichtje', name: SPIRIT_EGG.name, h: 0 });
+    out.push({ key: 'konami', name: 'Het sneeuwt hartjes', h: -1 });
+    return out;
+  },
+  found(e) { return e.key === 'konami' ? !!Save.data.konamiFound : !!(Save.data.eggs || {})[e.key]; },
+  open() { G.state = 'EGGS'; this.idx = 0; },
+  update() {
+    if (Dialog.active) { Dialog.update(1 / 60); return; }
+    const l = this.list(), n = l.length + 1;
+    if (Input.hit('up')) { this.idx = (this.idx + n - 1) % n; Sfx.select(); }
+    if (Input.hit('down')) { this.idx = (this.idx + 1) % n; Sfx.select(); }
+    if (Input.hit('skip') || Input.hit('restart') || (Input.hit('ok') && this.idx === l.length)) { Sfx.ok(); goTitle(); G.titleIdx = -1; return; }
+    if (Input.hit('ok')) {
+      const e = l[this.idx];
+      if (this.found(e)) say(['* ' + e.name + (e.h > 0 ? ' (hoofdstuk ' + e.h + ')' : '') + '. Goed gezocht!']);
+      else if (e.h > 0) say(['* Ergens in hoofdstuk ' + e.h + ' gebeurt iets kleins. Klik eens op de achtergrond, of bekijk iets een tweede keer...']);
+      else if (e.h === 0) say(['* Heb je al eens op jezelf geklikt?']);
+      else say(['* Een heel oude geheime code uit de spelletjeswereld. Acht pijltjes... en twee letters.']);
+    }
+  },
+  draw() {
+    R(0, 0, W, H, PAL.black);
+    txt('VERRASSINGEN', W / 2, 8, PAL.yellow, 'center', 10);
+    txt('psst... dit menu is geheim (' + eggCount() + '/' + (EGG_TOTAL + 1) + ' gevonden)', W / 2, 22, PAL.g7, 'center', 6);
+    const l = this.list();
+    for (let i = 0; i <= l.length; i++) {
+      const y = 36 + i * 12, sel = i === this.idx;
+      const e = l[i];
+      const s = !e ? 'Terug' : (e.h > 0 ? 'H' + e.h : e.h === 0 ? '  ' : '  ') + '  ' + (this.found(e) ? e.name : '? ? ?');
+      if (sel) heart(30, y + 1, PAL.red);
+      txt(s, 44, y, sel ? PAL.yellow : (!e || this.found(e) ? PAL.white : PAL.g5), 'left', 8);
+      if (e && this.found(e)) drawGlint(24, y + 4, G.t + i);
+    }
+    Dialog.draw();
   }
 };
 
@@ -457,6 +551,8 @@ function draw() {
   switch (G.state) {
     case 'TITLE': Title.draw(); break;
     case 'MEMS': Mems.draw(); break;
+    case 'ABOUT': About.draw(); break;
+    case 'EGGS': Eggs.draw(); break;
     case 'STORY': drawStory(); break;
     case 'TRANSITION': drawTransition(); break;
     case 'END': Ending.draw(); break;
@@ -520,7 +616,7 @@ Input.onSeq = function (seq) {
   const s = seq.slice(-10);
   if (s.length === 10 && s.every((c, i) => c === k[i])) {
     G.hearts = !G.hearts;
-    Save.data.konami = G.hearts; Save.store();
+    Save.data.konami = G.hearts; Save.data.konamiFound = true; Save.store();
     Toast.show(G.hearts ? '♥ Het sneeuwt hartjes ♥' : 'Gewone sneeuw', 3);
     Sfx.warm();
   }
@@ -542,7 +638,11 @@ Input.onSeq = function (seq) {
   cv.addEventListener('pointerdown', e => {
     Sfx.unlock();
     const r = cv.getBoundingClientRect();
-    if (r.width && r.height) clickEgg((e.clientX - r.left) / r.width * W, (e.clientY - r.top) / r.height * H);
+    if (!r.width || !r.height) return;
+    const lx = (e.clientX - r.left) / r.width * W, ly = (e.clientY - r.top) / r.height * H;
+    // verborgen: op het titelscherm op het vlammetje klikken opent de verrassingen
+    if (G.state === 'TITLE' && !Menu.active && Math.abs(lx - W / 2) < 9 && ly > 96 && ly < 122) { Sfx.ok(); Eggs.open(); return; }
+    clickEgg(lx, ly);
   });
   const fb = document.getElementById('fbtn');
   if (fb) fb.addEventListener('pointerdown', e => { e.preventDefault(); Feedback.show(); });

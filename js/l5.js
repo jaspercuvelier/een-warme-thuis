@@ -32,7 +32,7 @@ LEVELS.push({
         if (L.solved) return;
         if (!understood(L)) { say(['* Sam, een klasgenoot. Sam kijkt naar de bank. Balt de vuisten. Kijkt weg. Kijkt weer.', ['Sam', '(Als ik iets zeg, ben ik de volgende...)']]); return; }
         say(['* Sam wil iets doen. Je voelt het. Sam heeft alleen wat... moed nodig.',
-          '* Geef Sam moed: druk [Z] wanneer het hartje precies in het midden staat.'], () => startAction(courageAction5()));
+          '* Geef Sam moed: druk op ' + OK_KEYS + ' wanneer het hartje precies in het midden staat.'], () => startAction(courageAction5()));
       } });
     L.objs.push({ id: 'bank', x: 92, y: 128, w: 52, h: 8, solid: true, sortY: 135, top: 104,
       draw: () => bench(92, 137, 52, '#6a5440'),
@@ -42,7 +42,7 @@ LEVELS.push({
     L.objs.push({ id: 'draak', x: 192, y: 176, w: 12, h: 6, top: 164,
       draw: () => { R(192, 176, 12, 8, PAL.g9); R(194, 178, 6, 2, PAL.g5); R(199, 177, 2, 2, PAL.g5); R(195, 181, 2, 1, PAL.orange); },
       inspect: (L, o) => say(o.n === 1 ? [cu('drawing'), '* Een tekening, uit het schetsboek gescheurd en weggewaaid.', '* Een grote draak spreidt zijn vleugel over een klein, gloeiend figuurtje.', '* Het figuurtje lijkt een beetje op... jou?', cuOff] :
-        ['* De tekening van de draak. Hij beschermt het kleine lichtje onder zijn vleugel.']) });
+        ['* De tekening van de draak. Hij beschermt het kleine vlammetje onder zijn vleugel.']) });
     L.objs.push({ id: 'paal', x: 270, y: 120, w: 6, h: 4, solid: true, top: 40,
       draw: () => { R(272, 46, 3, 78, PAL.g5); R(262, 36, 24, 14, PAL.g8); R(264, 38, 20, 10, PAL.g7); R(268, 50, 12, 2, PAL.orange); for (let i = 0; i < 4; i++) R(269 + i * 3, 52, 1, 6, PAL.g7); },
       inspect: () => say(['* Een basketbalring. Niemand mikt vandaag.']) });
@@ -142,7 +142,7 @@ function courageAction5() {
       const x = 40, y = 196, w = 240, h = 22;
       box(x - 6, y - 16, w + 12, h + 26, PAL.white, PAL.black, 1);
       txt('MOED', x, y - 12, PAL.white, 'left', 7);
-      txt('[Z] in het midden!', x + w, y - 12, PAL.g7, 'right', 7);
+      txt('[Z/spatie/enter] in het midden!', x + w, y - 12, PAL.g7, 'right', 7);
       R(x, y, w, h, PAL.g2); R(x + w * 0.28, y, w * 0.44, h, PAL.g3); R(x + w * 0.38, y, w * 0.24, h, PAL.g4);
       R(x + w * 0.45, y, w * 0.1, h, PAL.warm); R(x + w * 0.5, y, 1, h, PAL.white);
       const cx = x + this.pos * w;

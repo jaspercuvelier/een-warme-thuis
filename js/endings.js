@@ -69,7 +69,7 @@ const Ending = {
       steps.push({ say: ['* Negen kleine dingen die niemand zag.',
         '* Een wantje. Een boodschappenlijstje. Een tekening. Een bonnetje. Een kras in een bank. Een zon op de koelkast. Een knuffel. Een sticker. Een huis in de modder.',
         '* Zo werkt warmte. Klein. Onopvallend. En toch overal.',
-        ['het lichtje', 'Dank je om ze te zien.']] });
+        ['het vlammetje', 'Dank je om ze te zien.']] });
     }
     steps.push({ card: { title: 'BEDANKT OM TE SPELEN', lines: [
       'Warmte: ' + score + ' / 9',
@@ -203,7 +203,7 @@ const Ending = {
     box(20, y, 280, h, c.color, PAL.black, 1);
     txt(c.title, W / 2, y + 10, c.color, 'center', 12);
     c.lines.forEach((l, i) => txt(l, W / 2, y + 32 + i * 11, PAL.white, 'center', 7));
-    if (this.cardT > 1.2 && Math.floor(G.t * 2) % 2 === 0) txt('[Z]', W / 2, y + h - 11, PAL.g7, 'center', 7);
+    if (this.cardT > 1.2 && Math.floor(G.t * 2) % 2 === 0) txt('[' + OK_KEYS + ']', W / 2, y + h - 11, PAL.g7, 'center', 7);
     ctx.globalAlpha = 1;
   }
 };

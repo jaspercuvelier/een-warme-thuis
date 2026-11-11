@@ -203,5 +203,5 @@ window.addEventListener('load', () => {
 
 window.addEventListener('keydown', e => {
   if (Feedback.open) return;
-  if (e.code === 'KeyF' && !e.repeat && !e.ctrlKey && !e.metaKey) { e.preventDefault(); Feedback.show(); }
+  if (keyName(e) === 'KeyF' && !e.repeat && !e.ctrlKey && !e.metaKey) { e.preventDefault(); Feedback.show(); }
 }, true);

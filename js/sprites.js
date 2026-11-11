@@ -165,7 +165,7 @@ function drawPerson(x, y, o) {
     else {
       R(hx, hy - 1, hw, hh, hair);
       if (style === 'long' || style === 'pony' || style === 'curlylong') R(hx, hy + hh - 1, hw, style === 'curlylong' ? 7 : 4, hair);
-      if (style === 'curlylong') for (let i = 0; i < hw; i += 2) R(hx + i - 1, hy - 2 + (i % 4 ? 1 : 0), 2, 1, hair);
+      if (style === 'curlylong') { R(hx + 1, hy - 2, hw - 2, 1, hair); R(hx - 1, hy, hw + 2, hh + 4, hair); R(hx, hy + hh + 4, 2, 2, hair); R(hx + hw - 2, hy + hh + 4, 2, 2, hair); R(x - 1, hy + 2, 1, hh, shade(hair, -16)); }
       if (style === 'bun') R(x - 2, hy - 3, 4, 3, hair);
       if (style === 'cap' || style === 'beanie') R(hx - 1, hy - 2, hw + 2, 4, capC);
     }
@@ -188,11 +188,13 @@ function drawPerson(x, y, o) {
       if (style === 'long') { R(backSide - (dir > 0 ? 1 : 0), hy + 2, 3, hh + 3, hair); R(dir > 0 ? hx + hw - 1 : hx, hy + 1, 1, 3, hair); }
       if (style === 'pony') { R(dir > 0 ? hx - 2 : hx + hw, hy + 2, 2, 7, hair); }
       if (style === 'bun') { R(dir > 0 ? hx - 1 : hx + hw - 3, hy - 3, 4, 4, hair); }
-      if (style === 'curlylong') { // lang, krullend haar tot op de schouders
-        R(hx - 1, hy - 2, hw + 2, 4, hair); for (let i = 0; i < hw; i += 2) R(hx + i, hy - 3, 1, 1, hair);
-        R(backSide - 2, hy, 5, hh + 6, hair); R(dir > 0 ? backSide - 3 : backSide + 4, hy + 3, 1, hh + 1, hair);
-        for (let j = 0; j < hh + 5; j += 3) R(dir > 0 ? backSide - 3 : backSide + 4, hy + j, 1, 1, shade(hair, -18));
-        R(dir > 0 ? hx + hw - 1 : hx, hy + 1, 1, 6, hair); R(dir > 0 ? hx + hw : hx - 1, hy + 3, 1, 4, hair); }
+      if (style === 'curlylong') { // lang, golvend haar tot op de schouders: ronde kruin, geen piekjes
+        const hl = shade(hair, -16), front = dir > 0 ? hx + hw - 1 : hx;
+        R(hx + 1, hy - 2, hw - 2, 1, hair); R(hx - 1, hy - 1, hw + 2, 3, hair);
+        R(dir > 0 ? hx + 1 : hx + 3, hy - 2, hw - 4, 1, hl);
+        R(backSide - 2, hy, 5, hh + 4, hair); R(backSide - 1, hy + hh + 4, 3, 2, hair);
+        R(dir > 0 ? backSide - 1 : backSide + 2, hy + 3, 1, hh - 1, hl);
+        R(front, hy + 1, 1, 4, hair); R(dir > 0 ? front + 1 : front - 1, hy + 1, 1, hh + 1, hair); }
       if (style === 'curly') { R(hx - 1, hy - 2, hw + 2, 4, hair); R(backSide - 1, hy + 1, 3, 5, hair); for (let i = 0; i < hw; i += 2) R(hx + i, hy - 3, 1, 1, hair); }
       if (style === 'spiky') { for (let i = 0; i < hw; i += 2) R(hx + i, hy - 2, 1, 1, hair); }
       if (style === 'cap') { R(hx - 1, hy - 2, hw + 2, 3, capC); R(dir > 0 ? hx + hw - 1 : hx - 3, hy, 4, 1, capC); }
@@ -288,51 +290,87 @@ function drawCat(x, y, t, o) {
   RR(10, -10, 1, 1, '#e8a0a0');
 }
 
-/* ---------- Het lichtje (jij) ---------- */
-/* Het lichtje: een klein vlammenwezentje. Lijf van warm licht, flakkerende vlammetjes
-   op het hoofd, zwarte oogjes en blosjes, stompe armpjes en beentjes. */
+/* ---------- Het vlammetje (jij) ---------- */
+/* Het vlammetje (zoals het logo van De Warmste Week): een hartvormige vlam met
+   flakkerende tongen bovenaan, geel in het midden en oranje aan de rand. */
+/* Vorm als raster van 15 x 20: een hart (onderaan) met drie vlammentongen erboven. */
+function spiritMask(t, sit) {
+  const m = [];
+  const fl = (i, base) => sit ? base - 2 : base + Math.sin(t * 9 + i * 2.1) * 1.1 + Math.sin(t * 13.7 + i) * 0.5;
+  const sway = sit ? 0 : Math.sin(t * 4) * 0.6;
+  const tongues = [
+    { c: 3.6, row: 10.5, h: fl(0, 5), hw: 2.2, lean: -1.6 + sway },
+    { c: 7.6, row: 10.5, h: fl(1, 8.5), hw: 2.6, lean: 1.2 + sway },
+    { c: 11.4, row: 10.5, h: fl(2, 5.5), hw: 2.2, lean: 1.8 + sway }
+  ];
+  for (let j = 0; j < 20; j++) {
+    const row = [];
+    for (let i = 0; i < 15; i++) {
+      const X = (i + 0.5 - 7.5) / 5.6, Y = (14.5 - j - 0.5) / 5.4;
+      const q = X * X + Y * Y - 1;
+      let inside = q * q * q - X * X * Y * Y * Y <= 0;
+      if (!inside) for (const tg of tongues) {
+        const k = (tg.row - (j + 0.5)) / tg.h;
+        if (k < 0 || k > 1) continue;
+        const w = tg.hw * Math.pow(1 - k, 0.85), c = tg.c + tg.lean * k * k;
+        if (Math.abs(i + 0.5 - c) <= w) { inside = true; break; }
+      }
+      row.push(inside);
+    }
+    m.push(row);
+  }
+  return m;
+}
+/* Tekent de vlamvorm met linkerbovenhoek (ox, oy) en pixelgrootte s. */
+const FLAME_RIM = ['#ff9600', '#ffb02a', '#ffd363', '#ffe682'];
+function drawFlameBody(ox, oy, s, t, sit) {
+  const m = spiritMask(t, sit);
+  const at = (i, j) => j >= 0 && j < 20 && i >= 0 && i < 15 && m[j][i];
+  const depth = (i, j) => {
+    for (let d = 1; d <= 3; d++) {
+      for (let a = -d; a <= d; a++) for (let c = -d; c <= d; c++) if (Math.abs(a) + Math.abs(c) === d && !at(i + a, j + c)) return d - 1;
+    }
+    return 3;
+  };
+  for (let j = 0; j < 20; j++) for (let i = 0; i < 15; i++) if (m[j][i]) {
+    ctx.fillStyle = FLAME_RIM[depth(i, j)];
+    if (s === 1) ctx.fillRect(Math.round(ox) + i, Math.round(oy) + j, 1, 1);
+    else ctx.fillRect(ox + i * s, oy + j * s, s, s);
+  }
+}
 function drawSpirit(x, y, t, p) {
   x = Math.round(x); y = Math.round(y);
   const moving = p && p.moving, frame = p && p.frame, sit = p && p.sit, dir = (p && p.dir) || 1;
-  const O = '#ff9a3c', O2 = '#f07a28', Y = '#ffcf4a', C = '#fff1b8', E = '#2a160c';
-  glow(x, y - 9, 28 + Math.sin(t * 2) * 2, '255,170,80', 0.24);
-  glow(x, y - 9, 11, '255,225,150', 0.4);
+  const O2 = '#e86a10', E = '#3a1c08';
+  glow(x, y - 10, 28 + Math.sin(t * 2) * 2, '255,170,60', 0.24);
+  glow(x, y - 9, 11, '255,225,130', 0.4);
   let bob = moving ? (frame ? -2 : 0) : (Math.sin(t * 3) > 0 ? -1 : 0);
   if (sit) bob = 2;
-  const b = y + bob;
-  // beentjes
+  const b = y + bob, gx = x - 7, gy = b - 21;
+  // beentjes naast de punt
   if (!sit) {
     const l = moving ? (frame ? 1 : 0) : 0;
-    R(x - 3, y - 2 - l, 2, 2, O2); R(x + 1, y - 3 + l, 2, 2, O2);
+    R(x - 3, y - 2 - l, 2, 2, O2); R(x + 2, y - 3 + l, 2, 2, O2);
   }
-  // vlammetjes op het hoofd (flakkeren; rustig als het lichtje slaapt)
-  const fl = i => sit ? 1 : 1 + Math.round(1.5 + Math.sin(t * 9 + i * 2.1) * 1.5);
-  const h1 = fl(0), h2 = fl(1) + 1, h3 = fl(2);
-  R(x - 3, b - 11 - h1, 2, h1, O); R(x - 3, b - 11 - h1, 1, 1, Y);
-  R(x - 1, b - 12 - h2, 3, h2 + 1, Y); R(x, b - 12 - h2, 1, 1, C);
-  R(x + 2, b - 11 - h3, 2, h3, O); R(x + 3, b - 11 - h3, 1, 1, Y);
-  // lijf: oranje rand, gele gloed, licht gezichtje
-  R(x - 3, b - 12, 7, 1, O); R(x - 4, b - 11, 9, 2, O); R(x - 5, b - 9, 11, 6, O); R(x - 4, b - 3, 9, 1, O); R(x - 3, b - 2, 7, 1, O2);
-  R(x - 3, b - 11, 7, 2, Y); R(x - 4, b - 9, 9, 6, Y); R(x - 3, b - 3, 7, 1, Y);
-  R(x - 2, b - 10, 5, 6, C); R(x - 3, b - 9, 7, 4, C);
+  drawFlameBody(gx, gy, 1, t, sit);
   // armpjes
   const sw = moving ? (frame ? 1 : -1) : 0;
-  if (p && p.hug) { R(x - 4, b - 6, 9, 1, O2); }
-  else { R(x - 6, b - 8 + sw, 1, 3, O2); R(x + 5, b - 8 - sw, 1, 3, O2); }
+  if (p && p.hug) { R(x - 5, b - 8, 11, 1, O2); }
+  else { R(x - 7, b - 11 + sw, 1, 3, O2); R(x + 7, b - 11 - sw, 1, 3, O2); }
   // gezichtje
-  const ox = dir > 0 ? 1 : 0;
+  const ox = dir > 0 ? 1 : 0, fy = b - 12;
   if (sit && Math.floor(t * 0.7) % 2 === 0) {
-    R(x - 2 + ox, b - 8, 2, 1, E); R(x + 1 + ox, b - 8, 2, 1, E);
+    R(x - 3 + ox, fy + 1, 2, 1, E); R(x + 1 + ox, fy + 1, 2, 1, E);
   } else {
     const blink = Math.floor(t * 10) % 37 === 0;
-    R(x - 2 + ox, b - 9, 1, blink ? 1 : 2, E); R(x + 1 + ox, b - 9, 1, blink ? 1 : 2, E);
+    R(x - 2 + ox, fy, 1, blink ? 1 : 2, E); R(x + 1 + ox, fy, 1, blink ? 1 : 2, E);
   }
-  R(x - 1 + ox, b - 6, 2, 1, '#c0502a');
-  R(x - 3 + ox, b - 7, 1, 1, '#ff7a5a'); R(x + 2 + ox, b - 7, 1, 1, '#ff7a5a');
+  R(x - 1 + ox, fy + 3, 2, 1, '#c0402a');
+  R(x - 3 + ox, fy + 2, 1, 1, '#ff6a4a'); R(x + 2 + ox, fy + 2, 1, 1, '#ff6a4a');
   // vonkje dat opstijgt
   const sp = (t * 0.9 + x * 0.01) % 1;
-  if (!sit && Math.floor(t * 0.9 + x * 0.01) % 2 === 0) { ctx.globalAlpha = 1 - sp; R(x + 3 - Math.round(sp * 3), b - 15 - Math.round(sp * 8), 1, 1, Y); ctx.globalAlpha = 1; }
-  if (sit) { const z = (t * 0.8) % 2; txt('z', x + 5 + z * 3, b - 18 - z * 6, PAL.g7, 'left', 6); }
+  if (!sit && Math.floor(t * 0.9 + x * 0.01) % 2 === 0) { ctx.globalAlpha = 1 - sp; R(x + 3 - Math.round(sp * 3), b - 24 - Math.round(sp * 8), 1, 1, FLAME_RIM[3]); ctx.globalAlpha = 1; }
+  if (sit) { const z = (t * 0.8) % 2; txt('z', x + 7 + z * 3, b - 20 - z * 6, PAL.g7, 'left', 6); }
 }
 
 /* ---------- Kleine UI-dingen ---------- */

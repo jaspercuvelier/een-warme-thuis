@@ -37,7 +37,7 @@ LEVELS.push({
         if (L.solved) return;
         if (!understood(L)) { say(['* Een voetbal. Hij is uit het spel gerold en ligt hier stil.', '* Wie hoort er eigenlijk bij dit spel? Kijk eerst wat rond.']); return; }
         say(['* De bal ligt hier. Amir staat daar. De groep zoekt een speler.',
-          '* Richt met de pijltjes en bevestig met [Z]. Kies daarna de kracht met [Z].',
+          '* Richt met de pijltjes en bevestig met ' + OK_KEYS + '. Kies daarna op dezelfde manier de kracht.',
           '* Laat de bal precies tot aan Amirs voeten rollen.'], () => startAction(kickAction8()));
       } });
     L.objs.push({ id: 'bank', x: 36, y: 182, w: 44, h: 6, solid: true, draw: () => { bench(36, 190, 44, '#5a4a3a'); R(42, 176, 10, 6, '#7a3a34'); R(56, 177, 8, 5, '#3a4a6a'); },
@@ -162,8 +162,8 @@ function kickAction8() {
         const tg = this.target(L);
         ctx.strokeStyle = 'rgba(255,229,138,0.5)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(tg.x, tg.y, 14, 0, 7); ctx.stroke();
       }
-      box(70, 210, 180, 24, PAL.white, PAL.black, 1);
-      if (this.phase === 'aim') txt('Richten: pijltjes  ·  [Z] = vast', 160, 216, PAL.white, 'center', 7);
+      box(40, 210, 240, 24, PAL.white, PAL.black, 1);
+      if (this.phase === 'aim') txt('Richten: pijltjes  ·  Z/spatie/enter = vast', 160, 216, PAL.white, 'center', 7);
       else if (this.phase === 'power') { txt('KRACHT', 80, 216, PAL.white, 'left', 7); R(120, 216, 120, 8, PAL.g3); R(120, 216, 120 * this.pow, 8, this.pow > 0.8 ? PAL.red : PAL.warm); }
       else txt('...', 160, 216, PAL.white, 'center', 7);
     }
