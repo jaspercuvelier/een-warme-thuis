@@ -635,15 +635,69 @@ Input.onSeq = function (seq) {
     b.addEventListener('pointercancel', off);
     b.addEventListener('pointerleave', off);
   });
-  cv.addEventListener('pointerdown', e => {
-    Sfx.unlock();
+  // ---- zwevende joystick ----
+  const zone = document.getElementById('stick-zone'), stick = document.getElementById('stick');
+  const knob = stick && stick.querySelector('.knob');
+  const RAD = 46, DIRS = ['up', 'down', 'left', 'right'];
+  let sid = null, sx = 0, sy = 0, st = 0, moved = false;
+  const setDirs = want => DIRS.forEach(d => {
+    if (want[d] && !Input.down[d]) Input.press(d);
+    else if (!want[d] && Input.down[d]) Input.release(d);
+  });
+  const placeStick = (x, y) => {
+    const half = stick.offsetWidth / 2;
+    x = Math.max(half + 4, Math.min(window.innerWidth - half - 4, x));
+    y = Math.max(half + 4, Math.min(window.innerHeight - half - 4, y));
+    sx = x; sy = y;
+    stick.style.left = (x - half) + 'px'; stick.style.top = (y - half) + 'px'; stick.style.bottom = 'auto';
+  };
+  const resetStick = () => {
+    sid = null; setDirs({}); stick.classList.remove('active');
+    stick.style.left = stick.style.top = stick.style.bottom = ''; knob.style.transform = '';
+  };
+  if (zone && stick) {
+    zone.addEventListener('pointerdown', e => {
+      e.preventDefault(); Sfx.unlock();
+      if (sid !== null) return;
+      sid = e.pointerId; st = performance.now(); moved = false;
+      try { zone.setPointerCapture(e.pointerId); } catch (err) { }
+      placeStick(e.clientX, e.clientY); stick.classList.add('active');
+    });
+    zone.addEventListener('pointermove', e => {
+      if (e.pointerId !== sid) return;
+      e.preventDefault();
+      let dx = e.clientX - sx, dy = e.clientY - sy;
+      const len = Math.hypot(dx, dy);
+      if (len > 8) moved = true;
+      if (len > RAD) { dx *= RAD / len; dy *= RAD / len; }
+      knob.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+      const nx = dx / RAD, ny = dy / RAD, T = 0.38;
+      setDirs(len < 10 ? {} : { left: nx < -T, right: nx > T, up: ny < -T, down: ny > T });
+    });
+    const end = e => {
+      if (e.pointerId !== sid) return;
+      e.preventDefault();
+      const tap = !moved && performance.now() - st < 300;
+      resetStick();
+      if (tap && e.type === 'pointerup') canvasTap(e.clientX, e.clientY);
+    };
+    zone.addEventListener('pointerup', end);
+    zone.addEventListener('pointercancel', end);
+  }
+  // wie het scherm aanraakt, krijgt de aanraakbediening (ook op laptops met aanraakscherm)
+  window.addEventListener('pointerdown', e => { if (e.pointerType === 'touch') document.body.classList.add('touch'); }, true);
+
+  /* een tik of klik op het spel (verrassingen, het vlammetje op het titelscherm) */
+  function canvasTap(clientX, clientY) {
     const r = cv.getBoundingClientRect();
     if (!r.width || !r.height) return;
-    const lx = (e.clientX - r.left) / r.width * W, ly = (e.clientY - r.top) / r.height * H;
+    const lx = (clientX - r.left) / r.width * W, ly = (clientY - r.top) / r.height * H;
+    if (lx < 0 || ly < 0 || lx > W || ly > H) return;
     // verborgen: op het titelscherm op het vlammetje klikken opent de verrassingen
     if (G.state === 'TITLE' && !Menu.active && Math.abs(lx - W / 2) < 9 && ly > 96 && ly < 122) { Sfx.ok(); Eggs.open(); return; }
     clickEgg(lx, ly);
-  });
+  }
+  cv.addEventListener('pointerdown', e => { Sfx.unlock(); canvasTap(e.clientX, e.clientY); });
   const fb = document.getElementById('fbtn');
   if (fb) fb.addEventListener('pointerdown', e => { e.preventDefault(); Feedback.show(); });
 })();

@@ -12,19 +12,28 @@ body { display: flex; align-items: center; justify-content: center; font-family:
 }
 #touch { display: none; position: fixed; inset: auto 0 0 0; height: 0; pointer-events: none; }
 body.touch #touch { display: block; }
+/* ---------- Aanraakbediening: joystick en knoppen liggen als overlay over het spel ---------- */
+/* De joystick verschijnt waar je duim de linkerkant van het scherm raakt. */
+#stick-zone { position: fixed; left: 0; top: 64px; bottom: 0; width: 48vw; pointer-events: auto; touch-action: none; }
+#stick {
+  position: fixed; left: 28px; bottom: 28px; width: 116px; height: 116px; margin: 0; pointer-events: none;
+  border-radius: 50%; border: 2px solid rgba(255,255,255,0.28); background: rgba(255,255,255,0.05);
+  opacity: 0.55; transition: opacity 0.2s;
+}
+#stick.active { opacity: 1; transition: none; border-color: rgba(255,229,138,0.6); }
+#stick .knob {
+  position: absolute; left: 50%; top: 50%; width: 50px; height: 50px; margin: -25px 0 0 -25px;
+  border-radius: 50%; background: rgba(255,214,120,0.35); border: 2px solid rgba(255,229,138,0.75);
+}
 #touch button {
-  pointer-events: auto; position: fixed; width: 54px; height: 54px;
-  background: rgba(255,255,255,0.08); color: #fff; border: 2px solid rgba(255,255,255,0.6);
-  font: bold 20px "Courier New", monospace; border-radius: 0; touch-action: none;
+  pointer-events: auto; position: fixed; width: 64px; height: 64px;
+  background: rgba(0,0,0,0.25); color: rgba(255,255,255,0.85); border: 2px solid rgba(255,255,255,0.45);
+  font: bold 22px "Courier New", monospace; border-radius: 50%; touch-action: none;
 }
 #touch button.on { background: rgba(255,214,120,0.45); }
-#touch .up    { left: 66px;  bottom: 126px; }
-#touch .left  { left: 10px;  bottom: 70px; }
-#touch .right { left: 122px; bottom: 70px; }
-#touch .down  { left: 66px;  bottom: 14px; }
-#touch .x     { right: 80px; bottom: 30px; }
-#touch .z     { right: 14px; bottom: 80px; border-color: #ffe58a; color: #ffe58a; }
-#touch .f { right: 14px; top: 14px; bottom: auto; width: 40px; height: 40px; font-size: 16px; }
+#touch .z { right: 22px; bottom: 74px; border-color: rgba(255,229,138,0.8); color: #ffe58a; }
+#touch .x { right: 96px; bottom: 26px; width: 54px; height: 54px; font-size: 18px; }
+#touch .f { right: 14px; top: 14px; bottom: auto; width: 40px; height: 40px; font-size: 16px; border-radius: 8px; }
 
 /* ---------- Feedbackvenster (F) ---------- */
 #fb { display: none; position: fixed; inset: 0; z-index: 50; align-items: center; justify-content: center; background: rgba(0,0,0,0.55); }

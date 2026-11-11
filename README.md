@@ -30,7 +30,9 @@ In het hoofdmenu staat **Over ons**. Wie op het titelscherm boven *Nieuw spel* n
 **Snel naar een hoofdstuk (voor testen):** zet `#h1` t/m `#h9` achter het adres, bv. `index.html#h5`.
 `#warm`, `#lauw` en `#koud` tonen meteen een einde.
 
-Op een gsm of tablet verschijnen er knoppen op het scherm.
+Op een gsm of tablet ligt de bediening over het spel heen: zet je duim ergens op de linkerkant van het scherm,
+dan verschijnt daar een joystick (schuif om te lopen, ook schuin). Rechts staan de knoppen **Z** en **X**.
+Een korte tik links werkt gewoon als klik, bv. om verrassingen te vinden.
 
 ## Online zetten met GitHub Pages (gratis)
 
