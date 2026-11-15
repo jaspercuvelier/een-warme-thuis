@@ -260,10 +260,14 @@ function box3(x, y, w, h, label) {
   R(x, y - h, 1, h, '#6a5640');
   if (label) txt(label, x + w / 2 + 3, y - h + 4, PAL.g2, 'left', 5);
 }
-function bin(x, y, c) {
+function bin(x, y, c, open) {
   c = c || PAL.g5;
-  R(x - 6, y - 16, 12, 16, c); R(x - 7, y - 18, 14, 3, shade(c, -10));
+  R(x - 6, y - 16, 12, 16, c);
   for (let i = -4; i < 5; i += 3) R(x + i, y - 14, 1, 12, shade(c));
+  if (open) { // deksel opengeklapt: donkere opening, deksel schuin rechtsboven
+    R(x - 6, y - 18, 12, 2, '#101010'); R(x - 7, y - 16, 14, 1, shade(c, -10));
+    R(x + 2, y - 22, 6, 2, shade(c, -10)); R(x + 6, y - 20, 4, 2, shade(c, -10)); R(x + 8, y - 18, 2, 2, shade(c, -10));
+  } else R(x - 7, y - 18, 14, 3, shade(c, -10));
 }
 function bench(x, y, w, c) {
   c = c || '#5a4a3a';

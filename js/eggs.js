@@ -48,7 +48,7 @@ const EGGS = {
     { id: 'muis', obj: 'container', name: 'Een muisje!', area: [14, 78, 50, 40], foot: [14, 112, 50, 8],
       poke(L) {
         Sfx.tone(1800, 0.05, 'square', 0.03); Sfx.tone(2100, 0.05, 'square', 0.03, null, 0.08);
-        addFx(L, { x: 40, y: 117, update(dt) { this.t += dt; this.x += 70 * dt; if (Math.floor(this.t * 12) % 4 === 0) this.y = 117 + (Math.random() < 0.5 ? -1 : 0); return this.x < 158; },
+        addFx(L, { x: 40, y: 117, sortY: 117, update(dt) { this.t += dt; this.x += 70 * dt; if (Math.floor(this.t * 12) % 4 === 0) this.y = 117 + (Math.random() < 0.5 ? -1 : 0); return this.x < 158; },
           draw(t) { drawMouse(this.x, this.y, 1, t); } });
         floatText(L, 40, 100, 'piep!', PAL.g9);
       } }
@@ -85,9 +85,20 @@ const EGGS = {
     { id: 'duif', name: 'Een verdwaalde duif', area: [94, 106, 16, 18], foot: [82, 114, 12, 12],
       poke(L) {
         Sfx.tone(420, 0.12, 'sine', 0.04); Sfx.tone(380, 0.16, 'sine', 0.04, null, 0.15);
-        addFx(L, { update(dt) { this.t += dt; return this.t < 3; },
-          draw(t) { drawBird(102 - this.t * 30, 110 - this.t * 40 + Math.sin(this.t * 8) * 2, t, PAL.g6); } });
-        floatText(L, 102, 104, 'roekoe', PAL.g8);
+        L.binPop = 0.9; // het deksel van de vuilbak klapt even open
+        addFx(L, { update(dt) { this.t += dt; if (L.binPop > 0) L.binPop = Math.max(0, L.binPop - dt); return this.t < 3.4; },
+          draw(t) {
+            const k = this.t;
+            if (k < 0.4) { // de duif kruipt uit de opening van de vuilbak (alleen boven de rand zichtbaar)
+              ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, 104); ctx.clip();
+              drawBird(102, lerp(108, 100, k / 0.4), 0, PAL.g6);
+              ctx.restore();
+            } else { // ...en vliegt dan weg
+              const f = k - 0.4;
+              drawBird(102 - f * 30, 100 - f * 40 + Math.sin(f * 8) * 2, t, PAL.g6);
+            }
+          } });
+        floatText(L, 102, 96, 'roekoe', PAL.g8);
       } },
     { id: 'bel', obj: 'fiets', name: 'Tring tring!', area: [110, 112, 30, 16], foot: [110, 128, 30, 4],
       poke(L) {
@@ -231,4 +242,5 @@ function eggsUpdate(L, dt) {
     }
   }
 }
-function eggsDraw(L, t) { if (L.fx) L.fx.forEach(f => f.draw(t)); }
+/* effecten met sortY worden mee in diepte gesorteerd (in drawLevel); de rest komt bovenop */
+function eggsDraw(L, t) { if (L.fx) L.fx.forEach(f => { if (f.sortY === undefined) f.draw(t); }); }

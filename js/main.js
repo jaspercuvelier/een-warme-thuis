@@ -290,6 +290,7 @@ function drawLevel() {
   const list = [];
   L.objs.forEach(o => { if (o.draw && !o.gone) list.push({ y: o.sortY !== undefined ? o.sortY : o.y + o.h, f: () => o.draw(L, t, o) }); });
   list.push({ y: P.y + 0.5, f: () => drawSpirit(P.x, P.y - (P.hop > 0 ? Math.round(Math.sin(P.hop / 0.5 * Math.PI) * 6) : 0), G.t, P) });
+  if (L.fx) L.fx.forEach(f => { if (f.sortY !== undefined) list.push({ y: f.sortY, f: () => f.draw(t) }); });
   list.sort((a, b) => a.y - b.y);
   list.forEach(d => d.f());
   eggsDraw(L, t);

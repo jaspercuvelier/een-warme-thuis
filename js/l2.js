@@ -44,9 +44,8 @@ LEVELS.push({
       draw: (L, t) => {
         R(181, 113, 14, 2, '#5a4a3a'); R(187, 115, 2, 15, '#4a3a2c'); R(183, 129, 10, 1, '#4a3a2c');
         R(185, 109, 5, 4, PAL.g9); R(190, 110, 1, 2, PAL.g9);
-        if (L.solved) for (let i = 0; i < 2; i++) R(186 + i * 2, 104 - ((t * 6 + i * 3) % 5), 1, 2, PAL.g8);
       },
-      inspect: (L, o) => say(L.solved ? ['* De koffie is nu warm. Er ligt een koekje naast.'] : ['* Een kop koffie. Ijskoud.', '* Er drijft een velletje op.']) });
+      inspect: (L, o) => say(L.solved ? ['* De oude, koude koffie mag weg.', '* Aan tafel dampen twee verse kopjes. Met koekjes.'] : ['* Een kop koffie. Ijskoud.', '* Er drijft een velletje op.']) });
     // eettafel met twee stoelen
     L.objs.push({ id: 'stoel1', x: 44, y: 146, w: 12, h: 5, solid: true, sortY: 149, draw: () => chair(50, 150, 1, '#5a4a3a') });
     L.objs.push({ id: 'stoel2', x: 98, y: 146, w: 12, h: 5, solid: true, sortY: 149, top: 118, draw: () => chair(104, 150, -1, '#5a4a3a'),
@@ -72,7 +71,19 @@ LEVELS.push({
     L.objs.push({ id: 'klok', x: 14, y: 104, w: 16, h: 4, solid: true, top: 50, draw: (L, t) => pendulumClock(22, 64, t),
       inspect: (L, o) => { Sfx.click(); say(o.n < 4 ? ['* Tik. Tak. Tik. Tak.', '* In een stil huis is een klok het luidste geluid.'] : ['* Tik. Tak.', '* Opa heeft hem al 40 jaar. Mieke wond hem elke zondag op. Nu doet hij het.']); } });
     L.objs.push({ id: 'telefoon', x: 228, y: 122, w: 14, h: 6, solid: true, top: 98, clue: 'telefoon',
-      draw: () => { R(226, 112, 18, 2, '#5a4a3a'); R(228, 114, 2, 14, '#4a3a2c'); R(240, 114, 2, 14, '#4a3a2c'); R(229, 107, 12, 5, PAL.g8); R(230, 105, 10, 2, PAL.g9); R(233, 108, 4, 2, PAL.g6); },
+      draw: () => {
+        R(226, 112, 18, 2, '#5a4a3a'); R(228, 114, 2, 14, '#4a3a2c'); R(240, 114, 2, 14, '#4a3a2c');
+        // ouderwetse draaischijftelefoon (crème) met hoorn op de haak
+        const c = '#d8c8a4', s = '#a08c68', l = '#f4ecd8', d = '#3a2c20';
+        R(229, 105, 12, 7, c); R(228, 108, 14, 4, c); R(228, 111, 14, 1, s); R(240, 105, 1, 6, s);
+        R(233, 106, 4, 5, l); R(232, 107, 6, 3, l); // draaischijf
+        R(233, 107, 1, 1, d); R(236, 107, 1, 1, d); R(232, 108, 1, 1, d); R(237, 108, 1, 1, d); R(233, 109, 1, 1, d); R(236, 109, 1, 1, d);
+        R(234, 108, 2, 1, s);
+        R(229, 103, 2, 2, s); R(239, 103, 2, 2, s); // haak
+        R(230, 101, 10, 2, c); R(231, 101, 8, 1, l); // hoorn
+        R(227, 100, 5, 3, c); R(238, 100, 5, 3, c); R(227, 102, 5, 1, s); R(238, 102, 5, 1, s);
+        for (let i = 0; i < 6; i++) R(225 + (i % 2), 103 + i, 1, 1, s); R(226, 109, 2, 1, s); // krulsnoer
+      },
       inspect: () => say(['* De telefoon. Het laatste gesprek was 23 dagen geleden.', '* Een verkeerd nummer. Opa heeft toch tien minuten met de beller gepraat.']) });
     L.objs.push({ id: 'kapstok', x: 244, y: 104, w: 10, h: 6, solid: true, top: 50,
       draw: () => { coatRack(248, 106, ['#5a5048']); hat(252, 60, '#6a5a6a'); },

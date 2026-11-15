@@ -529,13 +529,27 @@ const CLOSEUPS = {
   key(t) {
     R(0, 0, 60, 42, '#140e0a');
     glow(30, 24, 36, '255,160,70', 0.35 + Math.sin(t * 9) * 0.05);
-    R(10, 22, 40, 14, '#a8846a'); R(8, 24, 4, 10, '#a8846a'); R(12, 20, 30, 4, '#a8846a');
-    for (let i = 14; i < 46; i += 6) R(i, 21, 1, 3, '#8a6a52');
-    R(42, 16, 6, 8, '#a8846a'); R(44, 14, 4, 4, '#a8846a');
-    R(16, 30, 26, 1, '#8a6a52'); R(20, 33, 18, 1, '#8a6a52');
-    R(18, 24, 8, 6, PAL.yellow); R(20, 26, 4, 2, '#a8846a');
-    R(26, 26, 16, 2, PAL.yellow); R(36, 28, 2, 3, PAL.yellow); R(40, 28, 2, 2, PAL.yellow);
-    R(19, 25, 1, 1, PAL.white);
+    const sk = '#b89a80', sd = '#8f7460', g = '#e8c060', gd = '#9a7428', gl = '#fff4c9';
+    // mouw
+    R(14, 37, 30, 5, '#4a4038'); R(14, 36, 30, 1, '#5a5048');
+    // open hand, handpalm naar boven, vingers los van elkaar
+    R(16, 21, 26, 14, sk); R(17, 35, 24, 2, sk); R(41, 22, 1, 13, sd);
+    [[17, 9, 5], [23, 6, 5], [29, 8, 5], [35, 12, 5]].forEach(([x, y, w]) => {
+      R(x, y + 1, w, 22 - y, sk); R(x + 1, y, w - 2, 1, sk);   // vinger met afgeronde top
+      R(x + w - 1, y + 1, 1, 20 - y, sd);                      // schaduw
+      R(x, y + Math.round((22 - y) / 2), w - 1, 1, sd);        // kreukel bij de knokkel
+      R(x + 1, y + 1, w - 3, 2, '#d8c0a8');                     // nagel
+    });
+    R(10, 25, 7, 6, sk); R(7, 21, 5, 6, sk); R(6, 19, 4, 3, sk); R(7, 26, 4, 1, sd); // duim
+    R(20, 32, 16, 1, sd); // lijn in de handpalm
+    // de sleutel ligt in de hand: ring met gat, steel en baard
+    R(19, 22, 7, 9, g); R(18, 23, 9, 7, g); R(21, 24, 3, 5, sk); R(20, 25, 5, 3, sk); R(21, 25, 3, 3, '#7a6050');
+    R(18, 29, 9, 1, gd); R(19, 30, 7, 1, gd);
+    R(27, 25, 21, 3, g); R(27, 27, 21, 1, gd); R(28, 25, 18, 1, gl);
+    R(43, 28, 2, 4, g); R(46, 28, 2, 3, g); R(43, 31, 2, 1, gd); R(46, 30, 2, 1, gd);
+    R(19, 23, 2, 1, gl); R(19, 24, 1, 1, PAL.white);
+    // fonkeling
+    if (Math.floor(t * 3) % 3 === 0) { R(35, 22, 1, 3, PAL.white); R(34, 23, 3, 1, PAL.white); }
   },
   /* H9 — gezichten rond het vuur */
   fireFaces(t) {

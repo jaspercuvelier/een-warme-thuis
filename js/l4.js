@@ -86,7 +86,7 @@ LEVELS.push({
     lookObj(L, 'etalage', 230, 106, 76, 3, 50, (L) => L.flags.shopLit ? ['* De etalage gloeit warm. Binnen zitten twee mensen aan een klein tafeltje.'] : ['* In de etalage liggen nog broden van vandaag.', '* Morgen zijn ze "van gisteren". Dan gaan ze weg.']);
     L.objs.push({ id: 'fiets', x: 112, y: 124, w: 28, h: 4, solid: true, top: 100, draw: () => { R(112, 112, 1, 14, PAL.g5); R(138, 112, 1, 14, PAL.g5); R(112, 112, 27, 1, PAL.g5); bike(126, 128); },
       inspect: () => say(['* Een fiets met een lekke band. Niemand heeft hem in weken bewogen.']) });
-    L.objs.push({ id: 'vuilbak', x: 96, y: 118, w: 12, h: 4, solid: true, draw: () => bin(102, 122, '#3a4a3a') });
+    L.objs.push({ id: 'vuilbak', x: 96, y: 118, w: 12, h: 4, solid: true, draw: (L) => bin(102, 122, '#3a4a3a', L.binPop > 0) });
     L.objs.push({ id: 'lamp', x: 150, y: 116, w: 6, h: 4, solid: true, draw: (L, t) => lampPost(152, 120, true, t) });
     L.objs.push({ id: 'busje', x: 213, y: 182, w: 98, h: 12, solid: true, sortY: 196,
       draw: (L, t) => drawVan(Math.round(L.vanX), 194, t, L.flags.vanGo) });

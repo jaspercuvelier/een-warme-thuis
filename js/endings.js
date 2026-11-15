@@ -57,7 +57,7 @@ const Ending = {
         'Organiseer er zelf één, met je klas of je vrienden.',
         'Of begin vandaag nog: kijk om naar iemand.',
         '',
-        'Wees solidair. Wees warm.'], color: PAL.orange } });
+        'Wees solidair. Wees warm.'], color: PAL.orange, logo: true } });
       steps.push({ fn: () => { this.cat = { x: 160, y: 190, state: 'walk' }; } });
       steps.push({ say: ['* ...', '* Het katje uit de steeg wordt wakker. Het rekt zich uit.', '* Dan stapt het recht naar jou toe. En gaat naast je zitten.',
         () => { if (this.cat) this.cat.state = 'sit'; Sfx.purr(); Closeup.show('catFinal'); },
@@ -198,11 +198,13 @@ const Ending = {
     const c = this.card;
     const a = Math.min(1, this.cardT * 1.5);
     ctx.globalAlpha = a * 0.88; R(0, 0, W, H, PAL.black); ctx.globalAlpha = a;
-    const h = 46 + c.lines.length * 11;
-    const y = Math.max(8, (H - h) / 2);
+    const off = c.logo ? 34 : 0; // ruimte voor het logo van De Warmste Week
+    const h = 46 + c.lines.length * 11 + off;
+    const y = Math.max(4, (H - h) / 2);
     box(20, y, 280, h, c.color, PAL.black, 1);
-    txt(c.title, W / 2, y + 10, c.color, 'center', 12);
-    c.lines.forEach((l, i) => txt(l, W / 2, y + 32 + i * 11, PAL.white, 'center', 7));
+    if (c.logo) drawLogo(W / 2 - 15, y + 6, 30);
+    txt(c.title, W / 2, y + 10 + off, c.color, 'center', 12);
+    c.lines.forEach((l, i) => txt(l, W / 2, y + 32 + off + i * 11, PAL.white, 'center', 7));
     if (this.cardT > 1.2 && Math.floor(G.t * 2) % 2 === 0) txt('[' + OK_KEYS + ']', W / 2, y + h - 11, PAL.g7, 'center', 7);
     ctx.globalAlpha = 1;
   }
