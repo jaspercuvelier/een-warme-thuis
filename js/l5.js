@@ -65,7 +65,7 @@ LEVELS.push({
       winFrame(210 + (i % 3) * 30, 18, 20, 22, { sky: '#202830', frame: PAL.g6, sill: false });
     }
     R(140, 6, 40, 10, PAL.g7); txt('DE LINDE', 160, 7, PAL.g2, 'center', 6);
-    wallClock(160, 26, t * 40);
+    wallClock(160, 26, t * 2);
     R(140, 44, 40, 54, PAL.g5); R(142, 46, 17, 52, '#3a3a40'); R(161, 46, 17, 52, '#3a3a40'); R(156, 70, 2, 4, PAL.g8); R(162, 70, 2, 4, PAL.g8);
     R(144, 50, 13, 14, '#202830'); R(163, 50, 13, 14, '#202830');
     // speelplaats

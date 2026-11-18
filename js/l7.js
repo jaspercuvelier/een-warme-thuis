@@ -25,7 +25,7 @@ LEVELS.push({
         if (L.solved) return;
         if (!understood(L)) { say(['* Els, de mentor, scrolt door huuradvertenties.', '* "Geen OCMW." "Garantie: drie maanden huur." "Enkel werkenden." Haar kaak spant zich.', ['Els', '(Ze verdient zoveel beter dan dit. Maar wat kan ik nog doen?)']]); return; }
         say(['* De twijfels zweven als donkere wolkjes door de kamer. Ook in het hoofd van Els.',
-          '* Help haar vertrouwen terug te vinden: vang 3 lichtjes van ZELFVERTROUWEN en KANSEN binnen 10 seconden.',
+          '* Help Els om haar vertrouwen terug te vinden: vang 3 lichtjes van ZELFVERTROUWEN en KANSEN binnen 10 seconden.',
           '* Ontwijk de TWIJFELS. (Bewegen met de pijltjes.)'], () => startAction(soulAction7()));
       } });
     L.objs.push({ id: 'dozenblok', x: 136, y: 140, w: 40, h: 12, solid: true, sortY: 149 });

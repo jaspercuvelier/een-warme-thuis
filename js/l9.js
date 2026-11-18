@@ -11,7 +11,7 @@ LEVELS.push({
   need: 2,
   cold: ['* Je liet hen in hun tenten.', '* Het hout bleef nat. De dekens bleven in hun kisten.', '* Iedereen had het koud. Alleen.'],
   onEnter(L) {
-    say(['* Modder. Regen die bijna sneeuw is. Tenten zover je kijken kan.',
+    say(['* Modder. Regen die bijna sneeuw is. Tenten zo ver je kunt kijken.',
       '* Je zou willen dat je de oorlog kon laten verdwijnen. Met één knip.',
       '* Maar je bent geen tovenaar.',
       '* ...Wat je wel kan: zorgen dat niemand hier alleen blijft in de kou.']);

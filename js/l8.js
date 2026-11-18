@@ -25,7 +25,7 @@ LEVELS.push({
         ['Amir', '(Thuis speelde ik elke dag. Op straat, met mijn neven. Met een bal van plastic zakken.)']] :
         [['Amir', '(Misschien vragen ze het. Misschien niet. Ik durf niet te vragen.)']]); } });
     L.kids.forEach((k, i) => npcObj(L, k, { id: 'kid' + i, clue: 'jongeren',
-      inspect: (L) => { if (L.solved) return; say(i === 0 ? [['Lotte', 'Waar is die bal nu weer naartoe?'], ['Lotte', 'We zijn maar met drie. Twee tegen één is geen match... We hebben eigenlijk nog iemand nodig.']] : [['Jongere', 'Zeg, iemand moet verdedigen! Ik sta niet in doel.']]); } }));
+      inspect: (L) => { if (L.solved) return; say(i === 0 ? [['Lotte', 'Waar is die bal nu weer naartoe?'], ['Lotte', 'We zijn maar met z\'n drieën. Twee tegen één is geen match... We hebben eigenlijk nog iemand nodig.']] : [['Jongere', 'Zeg, iemand moet verdedigen! Ik sta niet in doel.']]); } }));
     L.objs.push({ id: 'bal', x: 0, y: 0, w: 8, h: 6, top: 0,
       draw: (L, t, o) => {
         const b = L.ball; o.x = b.x - 4; o.y = b.y - 4; o.top = b.y - 16;

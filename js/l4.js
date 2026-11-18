@@ -59,7 +59,7 @@ LEVELS.push({
               ['Bakker', '"Ergens" is geen adres. Kom binnen. Ik heb nog soep van de middag, en brood dat anders weg moet.'],
               ['Bakker', 'Achteraan staat een bank naast de oven. Die blijft warm tot de ochtend.'],
               ['Man', 'Waarom zou u dat doen? U kent mij niet.'],
-              ['Bakker', 'Mijn vader sliep ook ooit buiten, toen hij hier pas aankwam. Iemand deed toen de deur open voor hem.'],
+              ['Bakker', 'Mijn vader sliep ook ooit buiten, toen hij hier pas aankwam. Toen deed iemand de deur voor hem open.'],
               ['Bakker', 'Ik ben Youssef.'],
               () => { m.expr = 'happy'; m.look.acc = PAL.orange; m.look.shiver = false; m.look.arm = null; },
               ['Man', '...Marcel. Ik heet Marcel.'],

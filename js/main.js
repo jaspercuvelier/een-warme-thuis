@@ -6,12 +6,12 @@
 
 const MEMORIES = [
   { cu: 'mitten', title: 'Een verloren wantje', text: 'Een klein rood wantje, netjes op een paaltje gehangen. Iemand verloor het. Iemand anders nam de moeite om het zichtbaar op te hangen. Niemand zal ooit weten wie.' },
-  { title: 'Een boodschappenlijstje', text: "In bibberig handschrift: 'koffie, melk, koekjes (voor als er iemand komt)'. Het lijstje is drie weken oud. De koekjes zijn nooit opengegaan." },
+  { title: 'Een boodschappenlijstje', text: "In bibberig handschrift: 'koffie, melk, koekjes (voor als er iemand komt)'. Het lijstje is drie weken oud. Het pak koekjes is nooit opengegaan." },
   { title: 'Een tekening van een boomhut', text: "Twee poppetjes in een boomhut. Eronder, in kindergeschrift: 'DAAN + MILAN = VOOR ALTIJD'. Het woord 'altijd' is twee keer onderstreept." },
   { title: 'Een bonnetje van de bakker', text: "Op een bonnetje aan de deur: '2x soep - al betaald, voor wie het nodig heeft.' Een uitgestelde soep. Iemand dacht aan een vreemde." },
   { title: 'Gekrast in een bank', text: "In het hout van de bank, heel klein: 'Jij bent goed zoals je bent.' Iemand schreef het hier jaren geleden. Misschien voor zichzelf." },
   { title: 'Een tekening op de koelkast', text: 'Lien tekende haar huis. Er komt rook uit de schoorsteen, en er staat een grote gele zon boven. In de tekening is het altijd warm.' },
-  { title: 'Een knuffel met één oog', text: "Een versleten knuffelkonijn met één oog. Op het label: 'Yasmina, 4 jaar'. Hij verhuisde zeven keer mee. Hij is gebleven." },
+  { title: 'Een knuffel met één oog', text: "Een versleten knuffelkonijn met één oog. Op het label: 'Yasmina, 4 jaar'. Hij is zeven keer mee verhuisd. Hij is altijd gebleven." },
   { title: 'Een sticker op het hek', text: "Een sticker met 'Welkom' in twaalf talen. Welcome. Bienvenue. Ahlan wa sahlan. Hoş geldin. Witaj. De letters zijn half weggekrast, maar het staat er nog." },
   { title: 'Een tekening in de modder', text: 'Een kind tekende een huis in de modder. Met een boom en een zon. De boom staat er niet meer. Het huis ook niet. De zon wel.' }
 ];
@@ -34,7 +34,7 @@ function clue(L, id) {
   if (L.clues.has(id)) return;
   L.clues.add(id);
   Sfx.clue();
-  if (L.clues.size === L.need) Toast.show('Je begrijpt wat hier scheelt.', 3);
+  if (L.clues.size === L.need) Toast.show('Je begrijpt wat hier aan de hand is.', 3);
 }
 function understood(L) { return L.clues.size >= L.need; }
 function notYet() {

@@ -45,7 +45,7 @@ LEVELS.push({
         R(181, 113, 14, 2, '#5a4a3a'); R(187, 115, 2, 15, '#4a3a2c'); R(183, 129, 10, 1, '#4a3a2c');
         R(185, 109, 5, 4, PAL.g9); R(190, 110, 1, 2, PAL.g9);
       },
-      inspect: (L, o) => say(L.solved ? ['* De oude, koude koffie mag weg.', '* Aan tafel dampen twee verse kopjes. Met koekjes.'] : ['* Een kop koffie. Ijskoud.', '* Er drijft een velletje op.']) });
+      inspect: (L, o) => say(L.solved ? ['* De oude, koude koffie mag weg.', '* Aan tafel dampen twee verse kopjes. Met koekjes.'] : ['* Een kop koffie. IJskoud.', '* Er drijft een velletje op.']) });
     // eettafel met twee stoelen
     L.objs.push({ id: 'stoel1', x: 44, y: 146, w: 12, h: 5, solid: true, sortY: 149, draw: () => chair(50, 150, 1, '#5a4a3a') });
     L.objs.push({ id: 'stoel2', x: 98, y: 146, w: 12, h: 5, solid: true, sortY: 149, top: 118, draw: () => chair(104, 150, -1, '#5a4a3a'),
@@ -199,11 +199,12 @@ function lampAction2() {
         ['Opa Jef', 'Fatma. Kom binnen, kom binnen. Wacht, ik heb nog koekjes. Ze waren voor als er eens iemand langskwam.'],
         () => { go(opa, [[252, 140], [200, 150], [44, 156], [50, 150]], 22); opa.endDir = 1; go(fat, [[266, 148], [200, 164], [110, 160], [104, 150]], 26); fat.endDir = -1; },
         waitArrive(opa, fat),
-        () => { opa.sit = true; fat.sit = true; fat.look.hold = null; L.flags.tableSet = true; },
-        pause(0.6),
+        () => { opa.sit = true; fat.dir = -1; },
         ['Buurvrouw Fatma', 'Mag ik hier zitten?'],
         '* Opa kijkt naar de tweede stoel. Drie jaar lang zat daar niemand.',
         ['Opa Jef', '...Ja. Ja, ga daar maar zitten. Dat is een goeie stoel.'],
+        () => { fat.sit = true; fat.look.hold = null; L.flags.tableSet = true; },
+        pause(0.6),
         cu('opaFace', { expr: 'happy', tear: true }),
         '* Tik. Tak. De klok tikt nog altijd. Maar je hoort hem niet meer.',
         cuOff

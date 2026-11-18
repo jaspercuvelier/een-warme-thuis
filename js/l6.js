@@ -98,7 +98,7 @@ LEVELS.push({
     txt(Math.round(12 + L.heat * 8) + '°', 99, 66, PAL.g7, 'center', 5);
     // foto en klok
     frameArt(60, 30, 20, 24, (x, y, w, h) => { R(x, y, w, h, '#7a8a9a'); R(x + 4, y + 6, 4, 4, PAL.g9); R(x + 10, y + 8, 3, 3, PAL.g9); R(x + 3, y + 10, 6, 10, '#6a5a5a'); R(x + 9, y + 11, 5, 9, '#5a6a5a'); });
-    wallClock(214, 36, t * 30);
+    wallClock(214, 36, t * 2);
     outlet(232, 94); lightSwitch(240, 60);
     wallDoor(L.door, t);
     rug(70, 160, 90, 26, '#3a3434', '#423a3a');
@@ -152,7 +152,7 @@ function draftAction6() {
         () => { L.door.target = 0; mama.arm = 'face'; },
         ['Mama', '...Ik weet het. Ik schaam me. Ik wil niet bedelen.'],
         () => { mama.arm = null; },
-        ['Karim', 'Hulp vragen is geen bedelen. Daar zijn wij net voor.'],
+        ['Karim', 'Hulp vragen is niet bedelen. Daar zijn wij net voor.'],
         ['Karim', 'Er is een noodfonds voor energie. Ik regel vanavond nog een tegoed. En morgen komt er iemand om die ramen te isoleren.'],
         cu('mama'),
         '* Mama zegt niets. Ze knikt alleen. Ze moet even haar ogen afvegen.',

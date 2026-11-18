@@ -46,7 +46,7 @@ const Ending = {
         '* Amir speelt voetbal met Lotte. Yasmina heeft een plantje mee.',
         '* En vlak bij het vuur ligt een katje te slapen.',
         '* Jij bracht hen samen.',
-        '* Niet met magische tovenarij, maar door mensen naar elkaar te laten omkijken.',
+        '* Niet met tovenarij, maar door mensen naar elkaar te laten omkijken.',
         '* Een warme thuis bouw je nooit alleen.'] });
       steps.push({ card: { title: 'DE WARMSTE WEEK', lines: [
         'Overal zijn mensen die vandaag een warme thuis missen.',
@@ -69,7 +69,7 @@ const Ending = {
       steps.push({ say: ['* Negen kleine dingen die niemand zag.',
         '* Een wantje. Een boodschappenlijstje. Een tekening. Een bonnetje. Een kras in een bank. Een zon op de koelkast. Een knuffel. Een sticker. Een huis in de modder.',
         '* Zo werkt warmte. Klein. Onopvallend. En toch overal.',
-        ['het vlammetje', 'Dank je om ze te zien.']] });
+        ['het vlammetje', 'Bedankt dat je ze zag.']] });
     }
     steps.push({ card: { title: 'BEDANKT OM TE SPELEN', lines: [
       'Warmte: ' + score + ' / 9',
