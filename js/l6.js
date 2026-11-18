@@ -39,7 +39,7 @@ LEVELS.push({
     npcObj(L, karim, { id: 'karim', solid: false });
     L.objs.push({ id: 'tafel', x: 56, y: 140, w: 46, h: 8, solid: true, sortY: 147, top: 118,
       draw: () => { table(56, 147, 46, '#4a4440'); for (let i = 0; i < 5; i++) R(60 + i * 8, 129, 7, 3, i === 2 ? PAL.red : PAL.g9); R(90, 127, 6, 5, PAL.g7); txt('€', 93, 127, PAL.g3, 'center', 5); },
-      inspect: () => say(['* Rekeningen. Gas. Elektriciteit. Huur. Een aanmaning in het rood.', '* Op een briefje in mama\'s handschrift: "Lien: nieuwe schoenen?" Doorgestreept.']) });
+      inspect: () => say(['* Rekeningen. Gas. Elektriciteit. Huur. Een aanmaning in het rood.', '* Op een briefje in mama\'s handschrift: "Lien: nieuwe schoenen?" Doorstreept.']) });
     L.objs.push({ id: 'stoel', x: 40, y: 142, w: 12, h: 5, solid: true, sortY: 145, draw: () => chair(46, 146, 1, '#4a4440') });
     L.objs.push({ id: 'zetel', x: 186, y: 124, w: 52, h: 10, solid: true, sortY: 133, top: 100, draw: () => sofa(188, 135, 48, '#4a4a5a') });
     L.objs.push({ id: 'kachel', x: 126, y: 104, w: 38, h: 4, top: 80,

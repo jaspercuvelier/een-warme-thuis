@@ -13,15 +13,16 @@ LEVELS.push({
   init(L) {
     L.tries = 0;
     const noor = L.noor = makeNPC({ x: 106, y: 136, dir: 1, sit: true,
-      look: { kid: true, hairStyle: 'long', hair: PAL.g2, coat: PAL.g8, stripes: '#b05048', pants: PAL.g4, expr: 'sad', arm: 'hold',
+      look: { kid: true, hairStyle: 'long', hair: PAL.g2, coat: PAL.g8, stripes: '#b05048', pants: PAL.g4, expr: 'sad', cry: true, arm: 'hold',
         hold: (hx, hy) => { R(hx - 2, hy - 3, 7, 6, PAL.g9); R(hx - 1, hy - 2, 3, 2, PAL.g5); } } });
     const sam = L.sam = makeNPC({ x: 236, y: 146, dir: -1, speed: 30,
       look: { kid: true, hairStyle: 'spiky', hair: PAL.g5, coat: '#6a7a6a', pants: PAL.g3, expr: 'worried' } });
-    const b1 = L.b1 = makeNPC({ x: 146, y: 142, dir: -1, speed: 40, look: { kid: true, hairStyle: 'cap', capC: PAL.g3, coat: PAL.g4, pants: PAL.g3, expr: 'laugh' } });
-    const b2 = L.b2 = makeNPC({ x: 128, y: 156, dir: -1, speed: 40, look: { kid: true, hairStyle: 'short', hair: PAL.g2, coat: PAL.g5, pants: PAL.g3, expr: 'happy' } });
+    const b1 = L.b1 = makeNPC({ x: 146, y: 142, dir: -1, speed: 40, look: { kid: true, hairStyle: 'cap', capC: PAL.g3, coat: PAL.g4, pants: PAL.g3, expr: 'laugh', mean: true } });
+    const b2 = L.b2 = makeNPC({ x: 128, y: 156, dir: -1, speed: 40, look: { kid: true, hairStyle: 'short', hair: PAL.g2, coat: PAL.g5, pants: PAL.g3, expr: 'sneer', mean: true } });
     npcObj(L, noor, { id: 'noor', clue: 'noor',
       inspect: (L, o) => { if (L.solved) return; say(o.n === 1 ? ['* Noor houdt haar schetsboek tegen zich aan. Haar trui is zelfgebreid, met rode strepen.',
         '* In het schetsboek: draken. Prachtige draken, met vleugels van wel duizend schubben.',
+        '* Er valt een traan op een vleugel. Noor veegt hem snel weg, maar er komen er meer.',
         ['Noor', '(Niet huilen. Niet hier. Nog vier uur tot de bel.)']] :
         [['Noor', '(Misschien moet ik gewoon stoppen met tekenen. Dan is er niks meer om te pesten.)']]); } });
     const pest = (n, id) => npcObj(L, n, { id, clue: 'pesters',
@@ -51,6 +52,13 @@ LEVELS.push({
     lookObj(L, 'klok', 150, 104, 20, 3, 14, ['* De schoolklok. Nog zeven minuten speeltijd.', '* Zeven minuten kunnen heel lang duren.']);
   },
   update(L, dt) {
+    // de pesters: wijzen naar Noor, lachen haar uit, grijnzen gemeen
+    if (!L.solved) {
+      const ph = L.t % 3.2;
+      L.b1.arm = ph < 1.4 ? 'reach' : undefined;
+      L.b1.expr = ph < 1.4 ? 'laugh' : 'sneer';
+      L.b2.expr = (L.t + 1.1) % 2.6 < 0.9 ? 'laugh' : 'sneer';
+    } else if (L.b1.arm) L.b1.arm = undefined;
     L.kids = L.kids || [{ x: 300, d: -1 }, { x: 240, d: 1 }];
     if (!L.solved) L.kids.forEach(k => { k.x += k.d * 26 * dt; if (k.x < 200 || k.x > 306) k.d *= -1; });
   },
@@ -72,9 +80,8 @@ LEVELS.push({
     tiles(0, 98, W, 142, '#26262a', '#2e2e32', 16);
     R(0, 98, W, 3, PAL.g4);
     ctx.strokeStyle = '#4a4a50'; ctx.lineWidth = 1;
-    for (let i = 0; i < 5; i++) ctx.strokeRect(30.5 + i * 13, 180.5, 12, 12);
     ctx.beginPath(); ctx.arc(220, 150, 22, 0, 7); ctx.stroke();
-    txt('1  2  3  4  5', 35, 183, '#4a4a50', 'left', 6);
+    drawHopscotch();
     // kinderen achteraan
     if (L.kids) L.kids.forEach((k, i) => drawPerson(k.x, 112 + i * 2, { kid: true, coat: i ? '#5a6a8a' : '#8a6a5a', pants: PAL.g3, hairStyle: i ? 'pony' : 'short', hair: PAL.g3, dir: k.d, moving: !L.solved, walk: Math.floor(t * 5 + i) % 2, expr: 'happy' }));
   },
@@ -127,7 +134,7 @@ function courageAction5() {
         () => { go(sam, [[134, 146], [130, 136]], 26); sam.endDir = -1; }, waitArrive(sam),
         () => { sam.sit = true; sam.expr = 'happy'; },
         ['Sam', 'Mag ik naast je zitten? ...Mag ik je draken eens zien?'],
-        () => { noor.dir = 1; noor.expr = 'happy'; noor.look.blush = true; },
+        () => { noor.dir = 1; noor.expr = 'happy'; noor.look.cry = false; noor.look.blush = true; },
         cu('noor'),
         ['Noor', '...Vind je ze echt niet raar?'],
         cuOff,
@@ -151,4 +158,43 @@ function courageAction5() {
       if (this.result !== null) txt(['MIS', 'BIJNA', 'GOED!', 'PERFECT!'][this.result], W / 2, y - 30, this.result >= 2 ? PAL.yellow : PAL.red, 'center', 10);
     }
   };
+}
+
+/* ---------- Hinkelpad in krijt: 1, 2, 3, 4|5, 6, 7|8 en bovenaan de hemel ---------- */
+const HOPS = { cx: 44, cw: 12, ch: 9, y0: 190 }; // y0 = bovenkant van vakje 1; elke rij ligt 9 pixels hoger
+function hopRows() {
+  const { cx, cw, ch, y0 } = HOPS;
+  const rows = [['1'], ['2'], ['3'], ['4', '5'], ['6'], ['7', '8']];
+  return rows.map((r, i) => ({ y: y0 - i * ch, cells: r, x: r.length === 1 ? cx - cw / 2 : cx - cw, w: r.length * cw }));
+}
+function drawHopscotch() {
+  const { cx, cw, ch } = HOPS, chalk = '#7e7e7a', chalk2 = '#5a5a5a';
+  const rows = hopRows();
+  rows.forEach((r, i) => {
+    // kader van de rij
+    R(r.x, r.y, r.w + 1, 1, chalk); R(r.x, r.y + ch, r.w + 1, 1, chalk);
+    R(r.x, r.y, 1, ch + 1, chalk); R(r.x + r.w, r.y, 1, ch + 1, chalk);
+    if (r.cells.length === 2) R(cx, r.y, 1, ch + 1, chalk);
+    r.cells.forEach((c, k) => txt(c, r.x + cw / 2 + k * cw + 0.5, r.y + 2, chalk, 'center', 6));
+  });
+  // de hemel: een halve boog boven vakjes 7 en 8
+  const top = rows[5].y;
+  for (let a = 0; a <= 64; a++) {
+    const an = Math.PI * a / 64;
+    R(cx - Math.cos(an) * cw, top - Math.sin(an) * (ch + 3), 1, 1, chalk);
+  }
+  txt('HEMEL', cx + 0.5, top - 7, chalk2, 'center', 4);
+  // het steentje ligt nog op vakje 3
+  R(cx - 4, rows[2].y + 5, 2, 2, PAL.g6); R(cx - 4, rows[2].y + 5, 1, 1, PAL.g8);
+}
+/* in welk vak staat (x, y)? 0..5 = de rijen, 6 = de hemel, -1 = ernaast */
+function hopCell(x, y) {
+  const { cx, cw, ch } = HOPS, rows = hopRows();
+  for (let i = 0; i < rows.length; i++) {
+    const r = rows[i];
+    if (y > r.y && y <= r.y + ch && x > r.x && x < r.x + r.w) return i;
+  }
+  const top = rows[5].y, dx = (x - cx) / cw, dy = (top - y) / (ch + 3);
+  if (y <= top && dx * dx + dy * dy < 1) return 6;
+  return -1;
 }

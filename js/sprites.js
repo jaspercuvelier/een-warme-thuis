@@ -40,6 +40,8 @@ function drawPerson(x, y, o) {
   // rillen: korte schokjes van 1 pixel, telkens een seconde, dan even stil
   if (o.shiver && !o.moving) { const ph = (t + x * 0.37) % 2.4; if (ph < 1.2) x += Math.floor(t * 12) % 2 ? 1 : 0; }
   if (o.moving && o.walk) bob -= 1;
+  // snikken: om de zoveel tijd een paar schokjes van de schouders
+  if (o.cry && !o.moving) { const ph = (t + x * 0.31) % 2.2; if (ph < 0.6 && Math.floor(ph * 10) % 2) bob -= 1; }
 
   // schaduw
   ctx.fillStyle = 'rgba(0,0,0,0.4)';
@@ -212,7 +214,12 @@ function drawPerson(x, y, o) {
     } else {
       R(e1, ey, 1, 2, eyeC); R(e2, ey, 1, 2, eyeC);
     }
-    if (expr === 'sad' || expr === 'worried') { R(dir > 0 ? e2 + 1 : e2 - 1, ey - 2, 1, 1, skinD); R(dir > 0 ? e1 - 1 : e1 + 1, ey - 2, 1, 1, skinD); }
+    if (expr === 'sad' || expr === 'worried' || o.cry) { R(dir > 0 ? e2 + 1 : e2 - 1, ey - 2, 1, 1, skinD); R(dir > 0 ? e1 - 1 : e1 + 1, ey - 2, 1, 1, skinD); }
+    if (expr === 'angry' || expr === 'yell' || expr === 'sneer' || (o.mean && expr !== 'surprised')) { // boze V-wenkbrauwen
+      const lo = Math.min(e1, e2), hi = Math.max(e1, e2), bc = '#2a1e1e';
+      R(lo - 1, ey - 3, 1, 2, bc); R(lo, ey - 2, 1, 1, bc); R(lo + 1, ey - 1, 1, 1, bc);
+      R(hi + 1, ey - 3, 1, 2, bc); R(hi, ey - 2, 1, 1, bc); R(hi - 1, ey - 1, 1, 1, bc);
+    }
     if (expr === 'determined') { R(e1 - (dir > 0 ? 1 : 0), ey - 1, 2, 1, PAL.g3); R(e2 - (dir > 0 ? 0 : 1), ey - 1, 2, 1, PAL.g3); }
     if (o.glasses) { // montuur: brug boven de ogen + pootje naar het oor (geen lijn onder de ogen: dat leek een snor)
       const gc = o.glassC || '#9a9aa4';
@@ -225,11 +232,23 @@ function drawPerson(x, y, o) {
       case 'happy': R(mx, my, 3, 1, MOUTH); R(mx - 1, my - 1, 1, 1, MOUTH); R(mx + 3, my - 1, 1, 1, MOUTH); break;
       case 'laugh': R(mx - 1, my - 1, 4, 2, MOUTH); R(mx, my - 1, 2, 1, PAL.white); break;
       case 'sad': R(mx, my - 1, 3, 1, MOUTH); R(mx - 1, my, 1, 1, MOUTH); R(mx + 3, my, 1, 1, MOUTH); break;
+      case 'angry': R(mx, my - 1, 3, 1, MOUTH); R(mx - 1, my, 1, 1, MOUTH); R(mx + 3, my, 1, 1, MOUTH); break;
+      case 'sneer': R(mx, my, 3, 1, MOUTH); R(dir > 0 ? mx + 3 : mx - 1, my - 1, 1, 1, MOUTH); break; // scheve, gemene grijns
+      case 'yell': R(mx, my - 2, 3, 2, MOUTH); R(mx, my - 2, 3, 1, PAL.white); break;
       case 'surprised': R(mx + 1, my - 1, 2, 2, MOUTH); break;
       case 'worried': R(mx, my, 1, 1, MOUTH); R(mx + 1, my - 1, 1, 1, MOUTH); R(mx + 2, my, 1, 1, MOUTH); break;
       default: R(mx, my, 3, 1, skinD);
     }
     if (o.blush) { R(e1 - (dir > 0 ? 0 : 1), ey + 2, 2, 1, 'rgba(232,87,76,0.75)'); }
+    if (o.cry) { // tranen over beide wangen, en af en toe een druppel die valt
+      const tc = '#bfe3ff';
+      [e1, e2].forEach((ex, i) => {
+        R(ex, ey + 2, 1, 2, 'rgba(191,227,255,0.6)');
+        const p = (t * 1.3 + i * 0.5 + x * 0.1) % 1;
+        R(ex, ey + 2 + Math.floor(p * 5), 1, 1, tc);
+        if (p > 0.8) R(ex + (i ? -1 : 1) * 0, ey + 8 + Math.floor((p - 0.8) * 20), 1, 1, tc);
+      });
+    }
     if (o.tear) { const ty = Math.floor(t * 6) % 4; R(e1, ey + 2 + ty, 1, 1, '#bfe3ff'); }
     if (hand === 'face') { R(e2 - 1, ey, 3, 3, skin); R(e1 - 1, ey, 3, 3, skin); }
     if (o.breath && Math.floor(t * 0.9 + x * 0.1) % 3 === 0) {

@@ -17,7 +17,7 @@ LEVELS.push({
     const milan = L.milan = makeNPC({ x: 174, y: 148, dir: 1, speed: 24,
       look: { kid: true, hairStyle: 'short', hair: PAL.g4, coat: '#7a6a5a', pants: PAL.g4, expr: 'sad' } });
     npcObj(L, daan, { id: 'daan', clue: 'daan',
-      inspect: (L, o) => { if (L.solved) return; say(o.n === 1 ? [['Daan', '(Hij heeft mijn controller kapotgegooid. Altijd hetzelfde met hem.)'], '* Daan staart naar de muur. Zijn kaak staat strak.'] :
+      inspect: (L, o) => { if (L.solved) return; say(o.n === 1 ? [['Daan', '(Hij heeft mijn controller kapotgegooid. Altijd hetzelfde met hem.)'], '* Daan balt zijn vuisten. Zijn kaak staat strak.'] :
         [['Daan', '(...Hij deed het waarschijnlijk niet expres. Maar ik ga zeker niet als eerste iets zeggen.)']]); } });
     npcObj(L, milan, { id: 'milan', clue: 'milan',
       inspect: (L, o) => { if (L.solved) return; say(o.n === 1 ? [['Milan', '(Het was een ongeluk. En hij luistert toch nooit.)'], ['Milan', '(Vroeger deden we alles samen. Wanneer is dat gestopt?)']] :
@@ -43,6 +43,7 @@ LEVELS.push({
               return;
             }
             L.flags.albumOut = true;
+            stopFight3(L);
             L.book = { k: 3, x: 95, y: 84, t: 0, landed: false };
             solve(L, [
               waitFor(() => L.book.landed, 3),
@@ -61,14 +62,14 @@ LEVELS.push({
               ['Daan', 'Ik KON vliegen. Heel even.'],
               () => { daan.expr = 'laugh'; milan.expr = 'laugh'; },
               cu('brothers'),
-              '* Ze lachen. Ze kijken elkaar voor het eerst vandaag aan.',
+              '* Ze lachen. Ze kijken elkaar aan. Voor het eerst vandaag zonder boos te zijn.',
               cuOff,
               () => { daan.expr = 'sad'; },
               ['Daan', '...Sorry van je controller. Ik was eigenlijk niet boos op jou. Ik was gewoon... boos.'],
               () => { daan.expr = 'happy'; milan.expr = 'happy'; },
               ['Milan', 'Weet ik. Ik ook.'],
               ['Milan', 'Zullen we hem samen proberen te maken? Zoals de boomhut. Scheef, maar van ons.'],
-              ['Daan', 'Deal. Maar ik doe het dak.']
+              ['Daan', 'Deal. Jij de schroefjes, ik de knopjes.']
             ]);
           }, 4);
       } });
@@ -101,6 +102,7 @@ LEVELS.push({
     L.objs.push({ id: 'bal', x: 204, y: 176, w: 8, h: 4, solid: false, draw: () => { R(204, 172, 7, 7, PAL.g9); R(206, 174, 3, 3, PAL.g4); } });
   },
   update(L, dt) {
+    fight3(L, dt);
     const b = L.book;
     if (b && !b.landed && b.k === 3) {
       b.t += dt;
@@ -109,6 +111,7 @@ LEVELS.push({
       if (p >= 1) b.landed = true;
     }
   },
+  drawFg(L) { drawFight3(L); },
   drawBg(L, t) {
     roomShell({ wall: '#262a34', wall2: '#2a2e38', pattern: 'stripes', floorC: '#3a3430', floorL: '#2c2622', trim: '#4a4a56' });
     // sjaal boven het bed
@@ -143,3 +146,105 @@ LEVELS.push({
     }
   }
 });
+
+/* ---------- De ruzie: schelden in stripballonnetjes, af en toe een mep, dan weer mokken ---------- */
+const FIGHT3_BASE = { daan: 148, milan: 174 };
+const GRAWLIX = [['#', '@', '$', '%', '!'], ['@', 'skull', '#', '!'], ['%', '&', 'bolt', '!'], ['#', 'skull', '@', '*', '!'], ['bolt', '$', '#', '!', '!'], ['@', '%', 'swirl', '!']];
+function fight3(L, dt) {
+  const { daan, milan } = L;
+  if (L.solved || L.fightOff) return;
+  if (Dialog.active || Menu.active || G.state !== 'EXPLORE') return;
+  const F = L.fight || (L.fight = { t: 0, phase: 'fight', next: 0.6, who: 0, word: 0, meps: 0, bubble: null, mep: null, pow: null });
+  F.t += dt;
+  const pair = [daan, milan], base = [FIGHT3_BASE.daan, FIGHT3_BASE.milan];
+  if (F.phase === 'fight') {
+    if (F.t < 0.1) { daan.dir = 1; milan.dir = -1; daan.expr = milan.expr = 'angry'; }
+    // scheldballonnetjes, om beurten
+    if (F.bubble) { F.bubble.t += dt; if (F.bubble.t > 0.95) { pair[F.bubble.who].expr = 'angry'; F.bubble = null; } }
+    F.next -= dt;
+    if (F.next <= 0 && !F.mep) {
+      const who = F.who; F.who = 1 - F.who;
+      F.bubble = { who, t: 0, sym: GRAWLIX[F.word++ % GRAWLIX.length] };
+      pair[who].expr = 'yell';
+      Sfx.tone(who ? 190 : 150, 0.07, 'sawtooth', 0.018, who ? 120 : 95); Sfx.tone(who ? 210 : 170, 0.07, 'sawtooth', 0.018, who ? 130 : 100, 0.1);
+      F.next = rnd(0.9, 1.25);
+      // na een paar scheldwoorden: een mep
+      if (F.word % 3 === 0) F.mepIn = 0.5;
+    }
+    if (F.mepIn !== undefined) { F.mepIn -= dt; if (F.mepIn <= 0) { F.mepIn = undefined; F.bubble = null; F.mep = { who: F.meps++ % 2, t: 0, hit: false }; } }
+    if (F.mep) {
+      const m = F.mep, a = pair[m.who], v = pair[1 - m.who], dir = m.who ? -1 : 1;
+      m.t += dt;
+      const lunge = m.t < 0.12 ? m.t / 0.12 : m.t < 0.4 ? 1 : Math.max(0, 1 - (m.t - 0.4) / 0.25);
+      a.x = base[m.who] + dir * 6 * lunge;
+      a.arm = m.t > 0.08 && m.t < 0.42 ? 'reach' : undefined;
+      if (!m.hit && m.t > 0.14) {
+        m.hit = true; Sfx.noise(0.06, 0.12); Sfx.tone(220, 0.12, 'square', 0.03, 70);
+        F.pow = { x: v.x - dir * 4, y: v.y - 20, t: 0 };
+        v.expr = 'surprised';
+      }
+      const knock = m.hit ? Math.max(0, 1 - (m.t - 0.14) / 0.5) : 0;
+      v.x = base[1 - m.who] + dir * 4 * knock;
+      if (m.t > 0.75) v.expr = 'yell';
+      if (m.t > 1.1) { a.x = base[m.who]; v.x = base[1 - m.who]; a.arm = undefined; v.expr = 'angry'; F.mep = null; F.next = 0.4; }
+    }
+    if (F.t > 8.5 && !F.mep && !F.bubble) { F.phase = 'sulk'; F.t = 0; F.next = 0; daan.dir = -1; milan.dir = 1; F.hmpf = { t: 0 }; Sfx.tone(130, 0.18, 'triangle', 0.03, 90); }
+  } else {
+    // mokken: rug naar elkaar
+    if (F.hmpf) { F.hmpf.t += dt; if (F.hmpf.t > 1.2) F.hmpf = null; }
+    daan.expr = 'angry'; milan.expr = 'sad';
+    if (F.t > 4.5) { F.phase = 'fight'; F.t = 0; F.next = 0.3; }
+  }
+  if (F.pow) { F.pow.t += dt; if (F.pow.t > 0.6) F.pow = null; }
+}
+function stopFight3(L) {
+  L.fightOff = true;
+  const { daan, milan } = L;
+  daan.x = FIGHT3_BASE.daan; milan.x = FIGHT3_BASE.milan; daan.arm = milan.arm = undefined;
+  daan.dir = -1; milan.dir = 1; daan.expr = milan.expr = 'sad';
+  if (L.fight) L.fight.bubble = L.fight.pow = L.fight.hmpf = null;
+}
+/* een piepklein stripballonnetje boven een hoofd */
+function comicBubble(x, y, w, tailX, shake) {
+  x = Math.round(x + shake); y = Math.round(y);
+  R(x + 1, y, w - 2, 11, PAL.black); R(x, y + 1, w, 9, PAL.black);
+  R(x + 1, y + 1, w - 2, 9, PAL.white); R(x + 2, y + 1, w - 4, 9, PAL.white);
+  // staartje naar de mond
+  R(tailX - 1, y + 10, 4, 1, PAL.white); R(tailX, y + 11, 2, 1, PAL.white); R(tailX + 1, y + 12, 1, 1, PAL.black);
+  R(tailX - 2, y + 10, 1, 1, PAL.black); R(tailX + 3, y + 10, 1, 1, PAL.black); R(tailX - 1, y + 11, 1, 1, PAL.black); R(tailX + 2, y + 11, 1, 1, PAL.black);
+  return x;
+}
+function grawlixIcon(k, x, y, i) {
+  const c = i % 2 ? PAL.red : PAL.black;
+  if (k === 'skull') { R(x, y, 5, 4, PAL.black); R(x + 1, y + 4, 3, 2, PAL.black); R(x + 1, y + 1, 1, 2, PAL.white); R(x + 3, y + 1, 1, 2, PAL.white); R(x + 2, y + 5, 1, 1, PAL.white); }
+  else if (k === 'bolt') { R(x + 2, y, 3, 1, PAL.orange); R(x + 1, y + 1, 2, 2, PAL.orange); R(x + 1, y + 3, 4, 1, PAL.orange); R(x + 2, y + 4, 2, 1, PAL.orange); R(x + 1, y + 5, 1, 2, PAL.orange); }
+  else if (k === 'swirl') { R(x, y + 1, 5, 1, c); R(x + 4, y + 1, 1, 4, c); R(x + 1, y + 5, 4, 1, c); R(x, y + 2, 1, 3, c); R(x + 2, y + 3, 1, 1, c); }
+  else txt(k, x + 2.5, y - 1, c, 'center', 7);
+}
+function drawFight3(L) {
+  const F = L.fight;
+  if (!F || L.solved || L.fightOff || Dialog.active) return;
+  const t = G.t;
+  const pair = [L.daan, L.milan];
+  if (F.bubble) {
+    const b = F.bubble, n = pair[b.who], sym = b.sym;
+    const w = sym.length * 6 + 4, side = b.who ? 1 : -1; // Daan links, Milan rechts: ballonnetjes naar buiten
+    const shake = Math.floor(t * 20) % 2;
+    const bx = n.x - w / 2 + side * 8, by = n.y - 46 - Math.min(1, b.t * 8) * 2;
+    const x0 = comicBubble(bx, by, w, n.x + side * 2, shake);
+    sym.forEach((k, i) => grawlixIcon(k, x0 + 2 + i * 6, by + 3, i));
+  }
+  if (F.hmpf && Math.floor(F.hmpf.t * 6) % 6 !== 5) {
+    pair.forEach((n, i) => { const side = i ? 1 : -1; const x0 = comicBubble(n.x - 13 + side * 6, n.y - 44, 26, n.x + side * 2, 0); txt('HMPF', x0 + 13, n.y - 43, PAL.g3, 'center', 6); });
+  }
+  if (F.pow) {
+    const p = F.pow, s = 1 + Math.min(1, p.t * 10);
+    ctx.globalAlpha = Math.max(0, 1 - Math.max(0, p.t - 0.35) / 0.25);
+    // sterretje van de klap
+    const rays = [[0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1]];
+    rays.forEach(([dx, dy], i) => { const l = (i % 2 ? 3 : 5) * s; for (let k = 2; k < l; k++) R(p.x + dx * k, p.y + dy * k, 1, 1, i % 2 ? PAL.orange : PAL.yellow); });
+    R(p.x - 1, p.y - 1, 3, 3, PAL.white);
+    txt('MEP!', p.x, p.y - 15 - p.t * 6, PAL.yellow, 'center', 7);
+    ctx.globalAlpha = 1;
+  }
+}

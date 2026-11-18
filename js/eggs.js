@@ -229,15 +229,14 @@ function eggsUpdate(L, dt) {
   if (P.hop > 0) P.hop = Math.max(0, P.hop - dt);
   if (L.swing > 0) L.swing = Math.max(0, L.swing - dt * 0.25);
   if (L.i === 4 && G.state === 'EXPLORE') {
-    // hinkelpad: vakjes 1 t/m 5 op de speelplaats, in volgorde
-    const box = Math.floor((P.x - 30) / 13);
-    const inBox = P.y > 180 && P.y < 194 && box >= 0 && box < 5 && (P.x - 30) % 13 < 12 ? box : -1;
+    // hinkelpad op de speelplaats: van vak 1 tot in de hemel, rij per rij
+    const inBox = hopCell(P.x, P.y);
     if (inBox !== L.hopLast) {
       L.hopLast = inBox;
       if (inBox >= 0) {
-        if (inBox === (L.hop || 0)) { L.hop = (L.hop || 0) + 1; Sfx.tone(523 + inBox * 110, 0.08, 'square', 0.03); }
-        else L.hop = inBox === 0 ? 1 : 0;
-        if (L.hop === 5) { L.hop = 0; sparkle(L, 62, 184, 14); floatText(L, 62, 172, 'HINKELKAMPIOEN!', PAL.yellow); Sfx.warm(); eggFound(L, EGGS[4][1]); }
+        if (inBox === (L.hop || 0)) { L.hop = (L.hop || 0) + 1; P.hop = 0.5; floatText(L, P.x, P.y - 26, ['1', '2', '3', '4-5', '6', '7-8', ''][inBox], PAL.soft); Sfx.tone(523 * Math.pow(2, [0, 2, 4, 5, 7, 9, 12][inBox] / 12), 0.08, 'square', 0.03); }
+        else if (inBox !== (L.hop || 0) - 1) L.hop = inBox === 0 ? 1 : 0;
+        if (L.hop === 7) { L.hop = 0; sparkle(L, HOPS.cx, 136, 14); floatText(L, HOPS.cx, 124, 'HINKELKAMPIOEN!', PAL.yellow); Sfx.warm(); eggFound(L, EGGS[4][1]); }
       }
     }
   }

@@ -415,11 +415,32 @@ const CLOSEUPS = {
     if (pen) drawPencil(pen[0], pen[1]);
     if (prog >= 1) { glow(19, 32, 10, '255,220,140', 0.25); miniHeart(50, 4 - Math.min(2, (t - 7)), PAL.red); }
   },
-  /* H5 — Noor lacht */
+  /* H5 — Noor huilt nog, veegt haar tranen weg met haar mouw, en lacht dan pas */
   noor(t) {
+    const STOP = 1.8, WIPE = 2.0, WIPED = 2.8, SMILE = 3.6;
     R(0, 0, 60, 42, '#7a8698'); R(0, 0, 60, 3, '#8a96a8');
-    glow(30, 16, 34, '255,236,200', 0.35);
-    bigFace(30, 9, t, { style: 'long', hair: PAL.g2, coat: PAL.g8, stripes: PAL.red, expr: [[0, 'worried'], [1.0, 'happy']], blush: t > 1 });
+    glow(30, 16, 34, '255,236,200', 0.35 * Math.min(1, Math.max(0.3, (t - 2) / 1.5)));
+    // snikken: het hoofd schokt even mee
+    const sob = t < STOP && (t % 0.9) < 0.3 && Math.floor(t * 12) % 2 ? 1 : 0;
+    const cy = 9 + sob;
+    bigFace(30, cy, t, { style: 'long', hair: PAL.g2, coat: PAL.g8, stripes: PAL.red,
+      expr: [[0, 'sad'], [WIPE, 'closed'], [WIPED, 'worried'], [SMILE, 'happy']], blush: t > SMILE });
+    // tranen uit beide ogen; na STOP komen er geen nieuwe meer, de laatste lopen nog uit
+    const ey = cy + 10, tc = '#bfe3ff';
+    const wet = t < WIPE ? 0.45 : Math.max(0, 0.45 * (1 - (t - WIPE) / 0.6));
+    [23, 34].forEach((ex, i) => {
+      if (wet > 0) { ctx.fillStyle = 'rgba(191,227,255,' + wet + ')'; ctx.fillRect(ex + 1, ey + 3, 1, 7); }
+      for (let k = 0; k < 2; k++) {
+        const ph = t * 1.1 + i * 0.37 + k * 0.5, p = ph % 1, born = (ph - p) / 1.1;
+        if (born < STOP && t < WIPE) R(ex + 1, ey + 3 + Math.round(p * 10), 1, 2, tc);
+      }
+    });
+    // de mouw veegt de tranen weg
+    if (t > WIPE && t < WIPED) {
+      const p = (t - WIPE) / (WIPED - WIPE), mx = 50 - p * 34;
+      R(mx, ey - 1, 14, 6, PAL.g8); R(mx, ey + 1, 14, 2, PAL.red); R(mx - 1, ey, 1, 4, PAL.g9);
+      R(mx + 14, ey + 5, 4, 10, PAL.g8);
+    }
   },
   /* H6 — mama */
   mama(t) {
